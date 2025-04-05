@@ -13,7 +13,7 @@ public class ReceiptController {
 	@Autowired
 	ReceiptRepository receiptRepository;
 
-	// Todo: Finish, Mr. G has a start
+	/*// Todo: Finish, Mr. G has a start
 	@PostMapping("/")
-	public ResponseEntity<ReceiptEntity> createRecipt() {}
+	public ResponseEntity<ReceiptEntity> createRecipt() {}*/
 }
