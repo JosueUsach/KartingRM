@@ -7,19 +7,19 @@ import MakeReservation from './components/MakeReservation';
 import Rack from './components/Rack';
 
 function App() {
-  return (
-    <Router>
-      <Navbar />
-      <main>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/Costs" element={<Costs />} />
-        <Route path="/MakeReservation" element={<MakeReservation />} />
-        <Route path="/Rack" element={<Rack />} />
-      </Routes>
-      </main>
-    </Router>
-  );
+	return (
+		<Router>
+			<Navbar />
+			<main>
+			<Routes>
+				<Route path="/" element={<Home />} />
+				<Route path="/Costs" element={<Costs />} />
+				<Route path="/MakeReservation" element={<MakeReservation />} />
+				<Route path="/Rack" element={<Rack />} />
+			</Routes>
+			</main>
+		</Router>
+	);
 }
 
 export default App;
