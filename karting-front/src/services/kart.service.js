@@ -1,11 +1,7 @@
-import axios from "axios";
-
-const api = axios.create({
-    baseURL: import.meta.env.VITE_BASE,
-});
+import httpClient from "../http-common";
 
 const getAll = () => {
-    return axios.get('/api/kart/');
+	return httpClient.get('/api/kart/');
 }
 
-export default getAll;
+export default { getAll };

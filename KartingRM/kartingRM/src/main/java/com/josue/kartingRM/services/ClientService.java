@@ -16,6 +16,9 @@ public class ClientService {
 	// Description: Adds the inputted client to the DB
 	// Output: A registered user
 	public ClientEntity registerClient(ClientEntity newClient) {
+		if (clientRepository.existsByClientEmail(newClient.getClientEmail()) && clientRepository.existsByClientRut(newClient.getClientRut())) {
+			throw new IllegalArgumentException("Correo ya registrado");
+		}
 		return clientRepository.save(newClient);
 	}
 
