@@ -115,6 +115,13 @@ const RegisterClient = () => {
 		clientService
 			.registerClient(form)
 			.then((res) => {
+				console.log("Registro", res);
+				if (res.data == "") {
+					console.log("El cliente ya está registrado con ese correo o RUT.");
+					alert("El cliente ya está registrado con ese correo o RUT.");
+					return;
+				}
+
 				console.log("Cliente registrado!:", res.data);
 				alert("Cliente registrado!");
 				setForm({
@@ -127,6 +134,7 @@ const RegisterClient = () => {
 			})
 			.catch((err) => {
 				console.error("Registro fallido:", err);
+				alert("Ocurrió un error al registrar el cliente.");
 			});
 	};
 
