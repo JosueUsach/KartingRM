@@ -16,8 +16,6 @@ public class ClientService {
 	// Description: Adds the inputted client to the DB
 	// Output: A registered user
 	public ClientEntity registerClient(ClientEntity newClient) {
-		System.out.println(clientRepository.existsByClientEmail(newClient.getClientEmail()));
-		System.out.println(clientRepository.existsByClientRut(newClient.getClientRut()));
 		if ((clientRepository.existsByClientEmail(newClient.getClientEmail())) || (clientRepository.existsByClientRut(newClient.getClientRut()))) {
 			System.out.printf("Client %s already exists\n", newClient.getClientRut());
 			return null;

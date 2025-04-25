@@ -1,16 +1,15 @@
 package com.josue.kartingRM.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "kart") // Todo: cannot resolve table???
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class KartEntity {
@@ -24,5 +23,5 @@ public class KartEntity {
 	private boolean available; // Either being used in a reservation or being maintained
 
 	@ManyToMany(mappedBy = "kartList")
-	private List<ReservationEntity> reservationList = new ArrayList<>();
+	private Set<ReservationEntity> reservationList = new HashSet<>();
 }

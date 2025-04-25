@@ -87,7 +87,7 @@ const PricingCards = () => {
 		},
 		tableRow: {
 			borderBottom: "1px solid #e0e0e0",
-			":last-child": {
+			":lastChild": {
 				borderBottom: "none",
 			},
 		},
@@ -95,7 +95,7 @@ const PricingCards = () => {
 			color: "#333",
 			padding: "15px",
 			textAlign: "center",
-			":first-child": {
+			":firstChild": {
 				fontWeight: "500",
 			},
 		},

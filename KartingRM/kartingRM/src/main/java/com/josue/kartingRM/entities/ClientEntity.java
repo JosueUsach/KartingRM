@@ -1,17 +1,16 @@
 package com.josue.kartingRM.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "client")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 
@@ -29,5 +28,5 @@ public class ClientEntity {
 	private LocalDate clientBirthDate;
 
 	@ManyToMany(mappedBy = "clientList")
-	private List<ReservationEntity> reservationList = new ArrayList<>();
+	private Set<ReservationEntity> reservationList = new HashSet<>();
 }

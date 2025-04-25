@@ -1,6 +1,7 @@
 package com.josue.kartingRM.controllers;
 
 import com.josue.kartingRM.entities.ReservationEntity;
+import com.josue.kartingRM.services.ClientService;
 import com.josue.kartingRM.services.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 public class ReservationController {
 	@Autowired
 	ReservationService reservationService;
+	ClientService clientService;
 
 	@GetMapping("/")
 	public ResponseEntity<List<ReservationEntity>> listReservations() {
@@ -26,6 +28,7 @@ public class ReservationController {
 
 	@PostMapping("/")
 	public ResponseEntity<ReservationEntity> addReservation(@RequestBody ReservationEntity reservation) {
+		System.out.println("add reservation");
 		ReservationEntity newReservation = reservationService.createReservation(reservation);
 		return ResponseEntity.ok(newReservation);
 	}
@@ -37,7 +40,7 @@ public class ReservationController {
 		return reservations.stream().map(res -> {
 			Map<String, Object> event = new HashMap<>();
 			event.put("id", res.getId());
-			event.put("title", "Reserva de " + res.getMainClientName());
+			event.put("title", "Reserva de " + res.getMainClientRut());
 			event.put("start", res.getStartTime());
 			event.put("end", res.getEndTime());
 			return event;
