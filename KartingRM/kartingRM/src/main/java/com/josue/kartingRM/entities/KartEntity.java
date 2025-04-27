@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "kart") // Todo: cannot resolve table???
+@Table(name = "kart")
 @Getter
 @Setter
 @NoArgsConstructor

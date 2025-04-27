@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import reservationService from "../services/reservation.service";
+import receiptService from "../services/receipt.service"; // Assuming you have a receipt service
 
 const MakeReservation = () => {
 	const [form, setForm] = useState({
 		startTime: "",
+		holidayCheck: false,
 		reservationType: 0, // 0=10min, 1=15min, 2=20min
 		riderAmount: 1,
-		clientRuts: [""], // First RUT is the main client's RUT
+		clientRuts: [{ rut: "", birthdayCheck: false, frequency: 1 }], // First RUT is the main client's RUT
 	});
 
 	const [endTime, setEndTime] = useState("");
@@ -26,7 +28,8 @@ const MakeReservation = () => {
 	const handleRiderAmountChange = (e) => {
 		const amount = Math.min(parseInt(e.target.value || 0), 15);
 		const updatedRuts = [...form.clientRuts];
-		while (updatedRuts.length < amount) updatedRuts.push("");
+		while (updatedRuts.length < amount)
+			updatedRuts.push({ rut: "", birthdayCheck: false, frequency: 1 });
 		while (updatedRuts.length > amount) updatedRuts.pop();
 
 		setForm({
@@ -38,11 +41,11 @@ const MakeReservation = () => {
 
 	const handleRUTChange = (index, value) => {
 		const updated = [...form.clientRuts];
-		updated[index] = formatRUT(value);
+		updated[index].rut = formatRUT(value);
 
 		// Ensure the first RUT is always synchronized with the main client's RUT
 		if (index === 0) {
-			updated[0] = formatRUT(value);
+			updated[0].rut = formatRUT(value);
 		}
 
 		setForm({
@@ -72,7 +75,6 @@ const MakeReservation = () => {
 		}
 	};
 
-	// RUT formatting function from second code
 	const formatRUT = (value) => {
 		let cleaned = value.replace(/[^\dkK]/gi, "").toUpperCase();
 		cleaned = cleaned.slice(0, 9);
@@ -95,6 +97,13 @@ const MakeReservation = () => {
 		return formatted;
 	};
 
+	const handleHolidayChange = (e) => {
+		setForm({
+			...form,
+			holidayCheck: e.target.checked,
+		});
+	};
+
 	const validateForm = () => {
 		let valid = true;
 		let newErrors = {};
@@ -103,29 +112,31 @@ const MakeReservation = () => {
 		const selectedStart = new Date(form.startTime);
 
 		if (!form.startTime) {
-			newErrors.startTime = "Start time is required";
+			newErrors.startTime = "Tiempo de inicio es requerido";
 			valid = false;
 		} else if (selectedStart < now) {
-			newErrors.startTime = "Start time cannot be in the past";
+			newErrors.startTime = "Tiempo de inicio no puede ser en el pasado";
 			valid = false;
 		}
 
 		if (form.riderAmount < 1 || form.riderAmount > 15) {
-			newErrors.riderAmount = "Must be between 1 and 15";
+			newErrors.riderAmount = "Cantidad de personas debe ser entre 1 y 15";
 			valid = false;
 		}
 
-		if (!form.clientRuts[0]) {
-			newErrors[`clientRut_0`] = "Main client RUT is required";
-			valid = false;
-		}
-
-		form.clientRuts.forEach((rut, index) => {
-			if (!rut) {
-				newErrors[`clientRut_${index}`] = `Client ${index + 1} RUT is required`;
+		form.clientRuts.forEach((client, index) => {
+			if (!client.rut) {
+				newErrors[`clientRut_${index}`] = `Rut del cliente ${
+					index + 1
+				} es requerido`;
 				valid = false;
 			}
 		});
+
+		if (!form.clientRuts[0].rut) {
+			newErrors[`clientRut_0`] = "Rut del cliente principal es requerido";
+			valid = false;
+		}
 
 		setErrors(newErrors);
 		return valid;
@@ -152,22 +163,40 @@ const MakeReservation = () => {
 				endTime: formatLocalDateTime(endTime),
 				reservationType: form.reservationType,
 				riderAmount: form.riderAmount,
-				mainClientRut: form.clientRuts[0],
-				clientRuts: form.clientRuts,
+				mainClientRut: form.clientRuts[0].rut,
+				clientRuts: form.clientRuts.map((client) => client.rut),
 			};
 
-			console.log("Sending data:", reservationData);
+			console.log("Sending reservation data:", reservationData);
 
-			// Send the entire reservationData object
-			await reservationService.saveReservation(reservationData);
+			// Save the reservation
+			const reservationResponse = await reservationService.saveReservation(
+				reservationData
+			);
+			console.log("Reservation saved:", reservationResponse.data);
 
-			alert("Reservation created successfully!");
+			// Save receipts for each client
+			for (const client of form.clientRuts) {
+				const receiptData = {
+					holidayCheck: form.holidayCheck,
+					clientRut: client.rut,
+					birthdayCheck: client.birthdayCheck,
+					monthlyVisits: client.frequency,
+					reservation: { id: reservationResponse.data.id },
+				};
+
+				console.log("Sending receipt data:", receiptData);
+				await receiptService.saveReceipt(receiptData);
+			}
+
+			alert("Reservation and receipts created successfully!");
 
 			setForm({
 				startTime: "",
+				holidayCheck: false,
 				reservationType: 0,
 				riderAmount: 1,
-				clientRuts: [""],
+				clientRuts: [{ rut: "", birthdayCheck: false, frequency: 1 }],
 			});
 			setEndTime("");
 		} catch (error) {
@@ -220,7 +249,7 @@ const MakeReservation = () => {
 
 	return (
 		<div style={{ padding: "2rem", textAlign: "center" }}>
-			<h2>Create Reservation</h2>
+			<h2>Reservar hora</h2>
 			<form
 				onSubmit={handleSubmit}
 				style={{
@@ -233,7 +262,7 @@ const MakeReservation = () => {
 			>
 				{/* Start Time */}
 				<div style={wrapperStyle}>
-					<label style={labelStyle}>Start Time</label>
+					<label style={labelStyle}>Hora y fecha de inicio</label>
 					<input
 						type="datetime-local"
 						name="startTime"
@@ -241,30 +270,50 @@ const MakeReservation = () => {
 						onChange={handleChange}
 						style={inputStyle}
 						min={new Date().toISOString().slice(0, 16)}
-						required
 					/>
 					<div style={errorStyle}>{errors.startTime}</div>
 				</div>
 
+				{/* Holiday check */}
+				<div
+					style={{
+						display: "flex",
+						alignItems: "center",
+					}}
+				>
+					<label style={{ marginRight: "1rem", fontWeight: "bold" }}>
+						Es fin de semana / feriado?
+					</label>
+					<input
+						type="checkbox"
+						checked={form.holidayCheck}
+						onChange={handleHolidayChange}
+						style={{
+							transform: "scale(1.5)",
+							margin: "0.5rem",
+						}}
+					/>
+				</div>
+
 				{/* Reservation Type */}
 				<div style={wrapperStyle}>
-					<label style={labelStyle}>Reservation Type</label>
+					<label style={labelStyle}>Duración</label>
 					<select
 						name="reservationType"
 						value={form.reservationType}
 						onChange={handleChange}
 						style={inputStyle}
 					>
-						<option value={0}>10 laps / 10 minutes</option>
-						<option value={1}>15 laps / 15 minutes</option>
-						<option value={2}>20 laps / 20 minutes</option>
+						<option value={0}>10 vueltas / 10 minutos</option>
+						<option value={1}>15 vueltas / 15 minutos</option>
+						<option value={2}>20 vueltas / 20 minutos</option>
 					</select>
 					<div style={errorStyle}>{errors.reservationType}</div>
 				</div>
 
 				{/* Rider Amount */}
 				<div style={wrapperStyle}>
-					<label style={labelStyle}>Rider Amount (max 15)</label>
+					<label style={labelStyle}>Cantidad de personas (15 máx.)</label>
 					<input
 						type="number"
 						name="riderAmount"
@@ -273,15 +322,14 @@ const MakeReservation = () => {
 						style={inputStyle}
 						min={1}
 						max={15}
-						required
 					/>
 					<div style={errorStyle}>{errors.riderAmount}</div>
 				</div>
 
 				{/* Client RUTs */}
 				<div style={wrapperStyle}>
-					<label style={labelStyle}>Client RUTs</label>
-					{form.clientRuts.map((rut, index) => (
+					<label style={labelStyle}>Clientes</label>
+					{form.clientRuts.map((client, index) => (
 						<div
 							key={index}
 							style={{
@@ -297,10 +345,9 @@ const MakeReservation = () => {
 										? "Rut Cliente principal"
 										: `Rut Cliente ${index + 1}`
 								}
-								value={rut}
+								value={client.rut}
 								onChange={(e) => handleRUTChange(index, e.target.value)}
 								style={{ ...inputStyle, marginRight: "1rem" }}
-								required
 							/>
 							<div
 								style={{
@@ -308,17 +355,23 @@ const MakeReservation = () => {
 									alignItems: "center",
 								}}
 							>
-								<label style={{ marginBottom: "0.2rem" }}>Frequencia</label>
+								<label style={{ marginBottom: "0.2rem" }}>Frecuencia</label>
 								<input
 									type="number"
 									name="frequency"
-									value={form.frequency || ""}
-									onChange={(e) =>
-										setForm({ ...form, frequency: e.target.value })
-									}
-									style={{ ...inputStyle, width: "100px" }}
+									value={client.frequency || ""}
+									onChange={(e) => {
+										const updatedClients = [...form.clientRuts];
+										updatedClients[index].frequency = e.target.value;
+										setForm({ ...form, clientRuts: updatedClients });
+									}}
+									style={{
+										...inputStyle,
+										width: "100px",
+										marginLeft: "0.5rem",
+										marginRight: "1rem",
+									}}
 									min={1}
-									required
 								/>
 							</div>
 							<div
@@ -329,7 +382,20 @@ const MakeReservation = () => {
 								}}
 							>
 								<label style={{ marginBottom: "0.2rem" }}>Cumpleaños</label>
-								<input type="checkbox" />
+								<input
+									type="checkbox"
+									checked={client.birthdayCheck}
+									onChange={(e) => {
+										const updatedClients = [...form.clientRuts];
+										updatedClients[index].birthdayCheck = e.target.checked;
+										setForm({ ...form, clientRuts: updatedClients });
+									}}
+									style={{
+										transform: "scale(1.5)",
+										margin: "0.5rem",
+										marginBottom: "0.5rem",
+									}}
+								/>
 							</div>
 
 							<div style={errorStyle}>{errors[`clientRut_${index}`]}</div>

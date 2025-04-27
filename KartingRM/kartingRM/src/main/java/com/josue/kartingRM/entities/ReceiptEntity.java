@@ -17,15 +17,20 @@ public class ReceiptEntity {
 	@Column(unique = true, nullable = false)
 	private Long id;
 
+	private String clientRut;
 	private String clientName;
 	private String clientEmail;
 	private double initialCost;
 	private double groupDiscount;
+	int monthlyVisits;
 	private double frequentClientDiscount;
+	boolean birthdayCheck;
 	private double birthdayDiscount;
+	boolean holidayCheck;
 	private double holidayDiscount;
 	private double totalCost;
 
-	@OneToOne(mappedBy = "receipt")
-	private ReservationEntity Reservation;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "reservation_id")
+	private ReservationEntity reservation;
 }

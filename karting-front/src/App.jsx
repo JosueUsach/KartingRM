@@ -6,6 +6,7 @@ import Costs from "./components/Costs";
 import MakeReservation from "./components/MakeReservation";
 import RegisterClient from "./components/RegisterClient";
 import Rack from "./components/Rack";
+import ClientList from "./components/ClientList";
 
 function App() {
 	return (
@@ -17,6 +18,7 @@ function App() {
 					<Route path="/Costs" element={<Costs />} />
 					<Route path="/MakeReservation" element={<MakeReservation />} />
 					<Route path="/RegisterClient" element={<RegisterClient />} />
+					<Route path="/ClientList" element={<ClientList />} />
 					<Route path="/Rack" element={<Rack />} />
 				</Routes>
 			</main>

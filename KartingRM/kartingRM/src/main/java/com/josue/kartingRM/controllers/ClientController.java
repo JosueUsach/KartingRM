@@ -21,6 +21,18 @@ public class ClientController {
 		return ResponseEntity.ok(clients);
 	}
 
+	@PutMapping("/")
+	public ResponseEntity<ClientEntity> updateClient(@RequestBody ClientEntity client) {
+		ClientEntity updatedClient = clientService.updateClient(client);
+		return ResponseEntity.ok(updatedClient);
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<ClientEntity> deleteClient(@PathVariable Long id) throws Exception {
+		var isDeleted =clientService.deleteClient(id);
+		return ResponseEntity.noContent().build();
+	}
+
 	@PostMapping("/")
 	public ResponseEntity<ClientEntity> registerClient(@RequestBody ClientEntity client) {
 		ClientEntity newClient = clientService.registerClient(client);

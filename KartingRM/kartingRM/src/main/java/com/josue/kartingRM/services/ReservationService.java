@@ -25,7 +25,6 @@ public class ReservationService {
 	// Description: Adds the inputted reservation to the DB
 	// Output: A saved reservation
 	public ReservationEntity createReservation(ReservationEntity reservation) {
-		System.out.println("reservation service");
 		// Link each client by RUT before saving the reservation
 		for (String rut : reservation.getClientRuts()) {
 			ClientEntity client = clientRepository.findByClientRut(rut)

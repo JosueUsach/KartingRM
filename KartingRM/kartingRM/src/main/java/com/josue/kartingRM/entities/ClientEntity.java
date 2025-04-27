@@ -1,5 +1,6 @@
 package com.josue.kartingRM.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,5 +29,6 @@ public class ClientEntity {
 	private LocalDate clientBirthDate;
 
 	@ManyToMany(mappedBy = "clientList")
+	@JsonIgnore
 	private Set<ReservationEntity> reservationList = new HashSet<>();
 }

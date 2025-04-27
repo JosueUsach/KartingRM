@@ -1,15 +1,23 @@
 import httpClient from "../http-common";
 
-const getAll = () => {
-	return httpClient.get('/api/client/');
-}
-
 const registerClient = (client) => {
 	return httpClient.post('/api/client/', client);
+}
+
+const getAll = () => {
+	return httpClient.get('/api/client/');
 }
 
 const getClientByEmail = (email) => {
 	return httpClient.get(`/api/client/${email}`);
 }
 
-export default { getAll, registerClient, getClientByEmail };
+const updateClient = (client) => {
+	return httpClient.put(`/api/client/${client.clientId}`, client);
+}
+
+const deleteClient = (clientId) => {
+	return httpClient.delete(`/api/client/${clientId}`);
+}
+
+export default { getAll, registerClient, getClientByEmail, updateClient, deleteClient };
