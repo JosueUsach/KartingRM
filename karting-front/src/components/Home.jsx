@@ -1,6 +1,6 @@
 const Home = () => {
 	return (
-		<div>
+		<div style={{ paddingTop: "300px" }}>
 			<h1>KartingRM</h1>
 			<p>
 				Esta pagina es para el uso exclusivo de los trabajadores de KartingRM,
@@ -9,5 +9,4 @@ const Home = () => {
 		</div>
 	);
 };
-//todo: añadir imagen de fondo y centrar texto
 export default Home;

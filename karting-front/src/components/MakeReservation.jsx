@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import reservationService from "../services/reservation.service";
-import receiptService from "../services/receipt.service"; // Assuming you have a receipt service
+import receiptService from "../services/receipt.service";
 
 const MakeReservation = () => {
 	const [form, setForm] = useState({
@@ -8,7 +8,7 @@ const MakeReservation = () => {
 		holidayCheck: false,
 		reservationType: 0, // 0=10min, 1=15min, 2=20min
 		riderAmount: 1,
-		clientRuts: [{ rut: "", birthdayCheck: false, frequency: 1 }], // First RUT is the main client's RUT
+		clientRuts: [{ rut: "", birthdayCheck: false, frequency: 1 }],
 	});
 
 	const [endTime, setEndTime] = useState("");
@@ -43,7 +43,6 @@ const MakeReservation = () => {
 		const updated = [...form.clientRuts];
 		updated[index].rut = formatRUT(value);
 
-		// Ensure the first RUT is always synchronized with the main client's RUT
 		if (index === 0) {
 			updated[0].rut = formatRUT(value);
 		}
@@ -75,6 +74,7 @@ const MakeReservation = () => {
 		}
 	};
 
+	// Format RUT function
 	const formatRUT = (value) => {
 		let cleaned = value.replace(/[^\dkK]/gi, "").toUpperCase();
 		cleaned = cleaned.slice(0, 9);
@@ -189,7 +189,7 @@ const MakeReservation = () => {
 				await receiptService.saveReceipt(receiptData);
 			}
 
-			alert("Reservation and receipts created successfully!");
+			alert("Reserva y comprobantes guardados!");
 
 			setForm({
 				startTime: "",
@@ -210,7 +210,7 @@ const MakeReservation = () => {
 		}
 	};
 
-	// 🎨 Styles
+	// Styles
 	const inputStyle = {
 		padding: "0.5rem",
 		width: "300px",
@@ -249,7 +249,7 @@ const MakeReservation = () => {
 
 	return (
 		<div style={{ padding: "2rem", textAlign: "center" }}>
-			<h2>Reservar hora</h2>
+			<h2 style={{ fontSize: "2.2rem" }}>Reservar hora</h2>
 			<form
 				onSubmit={handleSubmit}
 				style={{

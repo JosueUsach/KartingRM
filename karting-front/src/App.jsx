@@ -7,6 +7,7 @@ import MakeReservation from "./components/MakeReservation";
 import RegisterClient from "./components/RegisterClient";
 import Rack from "./components/Rack";
 import ClientList from "./components/ClientList";
+import Reports from "./components/Reports";
 
 function App() {
 	return (
@@ -20,6 +21,7 @@ function App() {
 					<Route path="/RegisterClient" element={<RegisterClient />} />
 					<Route path="/ClientList" element={<ClientList />} />
 					<Route path="/Rack" element={<Rack />} />
+					<Route path="/Reports" element={<Reports />} />
 				</Routes>
 			</main>
 		</Router>

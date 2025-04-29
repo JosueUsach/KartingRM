@@ -4,4 +4,8 @@ const saveReservation = (reservation) => {
 	return httpClient.post('/api/reservation/', reservation);
 };
 
-export default {saveReservation};
+const getReservationsForCalendar = () => {
+    return httpClient.get("/api/reservation/calendar");
+};
+
+export default { saveReservation, getReservationsForCalendar };

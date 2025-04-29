@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class ReservationService {
@@ -22,7 +21,7 @@ public class ReservationService {
 	private KartRepository kartRepository;
 
 	// Input: A reservation object
-	// Description: Adds the inputted reservation to the DB
+	// Description: Adds the inputted reservation to the DB and links all clients to it
 	// Output: A saved reservation
 	public ReservationEntity createReservation(ReservationEntity reservation) {
 		// Link each client by RUT before saving the reservation
@@ -30,10 +29,10 @@ public class ReservationService {
 			ClientEntity client = clientRepository.findByClientRut(rut)
 					.orElseThrow(() -> new RuntimeException("Client with RUT " + rut + " not found"));
 
-			// Link both sides
 			reservation.getClientList().add(client);
 		}
 
+		// Link as many karts as needed
 		for (int i = 1; i <= reservation.getRiderAmount(); i++) {
 			KartEntity kart = kartRepository.findById((long) i)
 					.orElseThrow(() -> new RuntimeException("Kart not found"));
@@ -41,12 +40,8 @@ public class ReservationService {
 			reservation.getKartList().add(kart);
 		}
 
-		// Now save the reservation with all clients linked
 		return reservationRepository.save(reservation);
 	}
-
-
-	public void addClientToReservation(ClientEntity client, ReservationEntity reservation) {}
 
 	// Description: Finds all reservations and puts them in an array
 	// Output: An array of reservations

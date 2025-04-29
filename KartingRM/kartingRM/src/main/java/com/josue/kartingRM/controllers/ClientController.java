@@ -29,7 +29,7 @@ public class ClientController {
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<ClientEntity> deleteClient(@PathVariable Long id) throws Exception {
-		var isDeleted =clientService.deleteClient(id);
+		var isDeleted = clientService.deleteClient(id);
 		return ResponseEntity.noContent().build();
 	}
 

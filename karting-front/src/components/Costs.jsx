@@ -143,8 +143,16 @@ const PricingCards = () => {
 		{ category: "Muy frecuente", visits: "7 a MAS veces", discount: "30%" },
 	];
 
+	const specialDiscountData = [
+		{ category: "Fin de semana o feriado", discount: "10%" },
+		{ category: "🎂 Cumpleaños 🎂", discount: "50%" },
+	];
+
 	return (
 		<div>
+			<h2 style={{ padding: "2rem", fontSize: "2.2rem" }}>
+				Tarifas y Descuentos
+			</h2>
 			{/* Pricing Cards Section */}
 			<div style={styles.container}>
 				{pricingPlans.map((plan, index) => (
@@ -211,6 +219,7 @@ const PricingCards = () => {
 				</table>
 			</div>
 
+			{/* Frequency Discount Table Section */}
 			<div style={styles.tableContainer}>
 				<h3 style={styles.tableTitle}>Descuentos por frecuencia de cliente</h3>
 				<p style={styles.perPerson}>
@@ -252,6 +261,55 @@ const PricingCards = () => {
 					</tbody>
 				</table>
 			</div>
+
+			{/* Special Discount Table Section */}
+			<div style={styles.tableContainer}>
+				<h3 style={styles.tableTitle}>Descuentos por día especial</h3>
+				<p style={styles.perPerson}>
+					Se aplica un descuento si la reserva se realiza en un día especial
+				</p>
+				<table style={styles.table}>
+					<thead>
+						<tr>
+							<th style={styles.tableHeader}>Día especial</th>
+							<th style={styles.tableHeader}>Descuento aplicado</th>
+						</tr>
+					</thead>
+					<tbody>
+						{specialDiscountData.map((row, index) => (
+							<tr
+								key={index}
+								style={{
+									...styles.tableRow,
+									...(index % 2 === 0 ? styles.evenRow : styles.oddRow),
+								}}
+							>
+								<td style={{ ...styles.tableCell, fontWeight: "bold" }}>
+									{row.category}
+								</td>
+								<td
+									style={{
+										...styles.tableCell,
+										color: "#d03434",
+										fontWeight: "bold",
+									}}
+								>
+									{row.discount}
+								</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+
+			{/* Birthday Discount Note */}
+			<p style={styles.perPerson}>
+				El descuento por cumpleaños solo se aplica a la persona que cumple años
+				y solo si el grupo es de 3 personas o mas. Si hay una segunda persona de
+				cumpleaños, el descuento solo se aplica si el grupo es de 6 personas o
+				más. El trabajador registrando la reserva se encargará de verificar los
+				cumplaños y aplicar el descuento correspondiente.
+			</p>
 		</div>
 	);
 };

@@ -52,6 +52,7 @@ const RegisterClient = () => {
 		}
 	};
 
+	// Validate form inputs
 	const validateForm = () => {
 		let valid = true;
 		let newErrors = {};
@@ -89,14 +90,14 @@ const RegisterClient = () => {
 			const today = new Date();
 			const maxAllowedDate = new Date();
 			const minAllowedDate = new Date();
-			minAllowedDate.setFullYear(today.getFullYear() - 18); // Client must be at least 18 years old
+			minAllowedDate.setFullYear(today.getFullYear() - 8); // Client must be at least 8 years old
 			maxAllowedDate.setFullYear(today.getFullYear() - 70); // Client must be less than 70 years old, health reasons
 
 			if (birthDate < maxAllowedDate) {
 				newErrors.clientBirthDate = "Cliente debe ser menor de 70 años";
 				valid = false;
 			} else if (birthDate > minAllowedDate) {
-				newErrors.clientBirthDate = "Cliente debe ser mayor de edad";
+				newErrors.clientBirthDate = "Cliente debe tener al menos 8 años";
 				valid = false;
 			}
 		}
@@ -160,7 +161,7 @@ const RegisterClient = () => {
 
 	return (
 		<div style={{ padding: "2rem", textAlign: "center" }}>
-			<h2>Registrar Cliente</h2>
+			<h2 style={{ fontSize: "2.2rem" }}>Registrar Cliente</h2>
 			<form
 				onSubmit={handleSubmit}
 				style={{

@@ -1,6 +1,5 @@
 package com.josue.kartingRM.entities;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -40,12 +39,12 @@ public class ReservationEntity {
 	private List<ReceiptEntity> receipts = new ArrayList<>();
 
 	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+	@JsonIgnore
 	@JoinTable(
 			name = "client_reservation",
 			joinColumns = @JoinColumn(name = "reservation_id"),
 			inverseJoinColumns = @JoinColumn(name = "client_id")
 	)
-	@JsonIgnore
 	private Set<ClientEntity> clientList = new HashSet<>();
 
 

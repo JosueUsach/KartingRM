@@ -10,6 +10,11 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 @Service
 @Transactional
 public class ReceiptService {
@@ -40,7 +45,6 @@ public class ReceiptService {
 			initialCost = 20000;
 		else if (reservationType == 2)	// 2. 20 laps or 20 min
 			initialCost = 25000;
-		System.out.println("initial cost: " + initialCost + "");
 
 		// Group discount calculation
 		double groupDiscount = 0;
@@ -51,7 +55,6 @@ public class ReceiptService {
 			groupDiscount = 0.2; // 20% off
 		else if (riderAmount >= 11 && riderAmount <= 15)
 			groupDiscount = 0.3; // 30% off
-		System.out.println("group discount: " + groupDiscount + "");
 
 		// Frequency discount calculation
 		int monthlyVisits = receipt.getMonthlyVisits();
@@ -62,28 +65,16 @@ public class ReceiptService {
 			frequentClientDiscount = 0.2; // 20% off
 		else if (monthlyVisits >= 7)
 			frequentClientDiscount = 0.3; // 30% off
-		System.out.println("frequent client discount: " + frequentClientDiscount + "");
 
 		// Birthday discount calculation
-		System.out.println("isBirthday: " + receipt.isBirthdayCheck() + "");
 		double birthdayDiscount = 0;
 		if (receipt.isBirthdayCheck())
 			birthdayDiscount = 0.5; // 50% off
-		System.out.println("birthday discount: " + birthdayDiscount + "");
 
 		// Holiday discount calculation
-		System.out.println("isHoliday: " + receipt.isHolidayCheck() + "");
 		double holidayDiscount = 0;
 		if (receipt.isHolidayCheck())
 			holidayDiscount = 0.1; // 10% off
-		System.out.println("holiday discount: " + holidayDiscount + "");
-
-		//double totalCost = initialCost * groupDiscount * frequentClientDiscount * birthdayDiscount * holidayDiscount;
-		double totalCost = ( initialCost - (
-				initialCost * groupDiscount +
-				initialCost * frequentClientDiscount +
-				initialCost * birthdayDiscount +
-				initialCost * holidayDiscount));
 
 		// Updating every discount to reflect how much it subtracted from the initial cost
 		groupDiscount = -(initialCost * groupDiscount);
@@ -91,8 +82,10 @@ public class ReceiptService {
 		birthdayDiscount = -(initialCost * birthdayDiscount);
 		holidayDiscount = -(initialCost * holidayDiscount);
 
-		//ReceiptEntity newReceipt = new ReceiptEntity();
-		//receipt.setClientRut(receipt.getClientRut());
+		// Calculating the total cost by subtracting the discount amounts from the initial cost
+		double totalCost = initialCost + groupDiscount + frequentClientDiscount + birthdayDiscount + holidayDiscount;
+
+		// Adding all the necessary data to the receipt
 		receipt.setClientName(clientName);
 		receipt.setClientEmail(clientEmail);
 		receipt.setInitialCost(initialCost);
@@ -107,5 +100,50 @@ public class ReceiptService {
 		reservation.getReceipts().add(receipt);
 
 		return receiptRepository.save(receipt);
+	}
+
+	// Description: Uses an SQL query to get a sales report, grouped by reservation type
+	// Output: A list of maps with the report data
+	public List<Map<String, Object>> generateSummaryReport() {
+		List<Object[]> results = receiptRepository.getReservationSummaryReport();
+
+		List<Map<String, Object>> report = new ArrayList<>();
+
+		for (Object[] row : results) {
+			Map<String, Object> rowMap = new LinkedHashMap<>();
+			rowMap.put("Número de vueltas o tiempo máximo permitido", row[0]);
+			rowMap.put("Cantidad de reservas", row[1]);
+			rowMap.put("Suma inicial", row[2]);
+			rowMap.put("Descuento cumpleaños", row[3]);
+			rowMap.put("Descuento cliente frecuente", row[4]);
+			rowMap.put("Descuento festivo", row[5]);
+			rowMap.put("Total", row[6]);
+			report.add(rowMap);
+		}
+
+		return report;
+	}
+
+	// Description: Uses an SQL query to get a sales report, grouped by rider amount
+	// Output: A list of maps with the report data
+	public List<Map<String, Object>> generateRiderGroupReport() {
+		List<Object[]> results = receiptRepository.getRiderGroupSizeReport();
+
+		List<Map<String, Object>> report = new ArrayList<>();
+
+		for (Object[] row : results) {
+			Map<String, Object> rowMap = new LinkedHashMap<>();
+			rowMap.put("Tamaño del grupo", row[0]);
+			rowMap.put("Cantidad de reservas", row[1]);
+			rowMap.put("Suma inicial", row[2]);
+			rowMap.put("Descuento cumpleaños", row[3]);
+			rowMap.put("Descuento cliente frecuente", row[4]);
+			rowMap.put("Descuento festivo", row[5]);
+			rowMap.put("Descuento por grupo", row[6]);
+			rowMap.put("Total", row[7]);
+			report.add(rowMap);
+		}
+
+		return report;
 	}
 }

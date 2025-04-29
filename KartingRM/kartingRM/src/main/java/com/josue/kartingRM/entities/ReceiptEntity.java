@@ -3,6 +3,8 @@ package com.josue.kartingRM.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "receipt")
 @Getter
@@ -22,11 +24,12 @@ public class ReceiptEntity {
 	private String clientEmail;
 	private double initialCost;
 	private double groupDiscount;
-	int monthlyVisits;
+	private LocalDateTime date;
+	private int monthlyVisits;
 	private double frequentClientDiscount;
-	boolean birthdayCheck;
+	private boolean birthdayCheck;
 	private double birthdayDiscount;
-	boolean holidayCheck;
+	private boolean holidayCheck;
 	private double holidayDiscount;
 	private double totalCost;
 

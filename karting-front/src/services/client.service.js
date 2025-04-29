@@ -13,7 +13,7 @@ const getClientByEmail = (email) => {
 }
 
 const updateClient = (client) => {
-	return httpClient.put(`/api/client/${client.clientId}`, client);
+	return httpClient.put('/api/client/', client);
 }
 
 const deleteClient = (clientId) => {

@@ -17,6 +17,7 @@ const pages = [
 	{ label: "Reservar hora", path: "/MakeReservation" },
 	{ label: "Clientes", path: "/ClientList" },
 	{ label: "Calendario", path: "/Rack" },
+	{ label: "Reportes de ingreso", path: "/Reports" },
 ];
 
 function Navbar() {

@@ -20,7 +20,7 @@ public class KartEntity {
 	private Long id;
 
 	private String model;
-	private boolean available; // Either being used in a reservation or being maintained
+	private boolean available;
 
 	@ManyToMany(mappedBy = "kartList")
 	private Set<ReservationEntity> reservationList = new HashSet<>();

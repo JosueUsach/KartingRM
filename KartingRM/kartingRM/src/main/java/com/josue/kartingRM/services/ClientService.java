@@ -41,7 +41,6 @@ public class ClientService {
 	// Input: A Client entity
 	// Description: Changes the desired parameters
 	// Output: A modified Client
-	//Todo: fix updateClient
 	public ClientEntity updateClient(ClientEntity client) {
 		return clientRepository.save(client);
 	}
