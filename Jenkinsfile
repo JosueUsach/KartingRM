@@ -28,7 +28,7 @@ pipeline {
 
         stage('Wait for Backend') {
             steps {
-                bat 'timeout /t 8 /nobreak'
+                powershell 'Start-Sleep -Seconds 8'
             }
         }
 
