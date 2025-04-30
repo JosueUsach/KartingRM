@@ -24,108 +24,82 @@ import static org.mockito.Mockito.when;
 
 class ReservationServiceTest {
 
-	@Mock
-	private ReservationRepository reservationRepository;
+    @Mock
+    private ReservationRepository reservationRepository;
 
-	@Mock
-	private ClientRepository clientRepository;
+    @Mock
+    private ClientRepository clientRepository;
 
-	@Mock
-	private KartRepository kartRepository;
+    @InjectMocks
+    private ReservationService reservationService;
 
-	@InjectMocks
-	private ReservationService reservationService;
+    private ReservationEntity testReservation;
+    private ClientEntity testClient;
 
-	private ReservationEntity testReservation;
-	private ClientEntity testClient;
-	private KartEntity testKart;
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
 
-	@BeforeEach
-	void setUp() {
-		MockitoAnnotations.openMocks(this);
+        // Setup test client
+        testClient = new ClientEntity();
+        testClient.setId(1L);
+        testClient.setClientRut("12.345.678-9");
+        testClient.setClientName("Test Client");
 
-		// Setup test client
-		testClient = new ClientEntity();
-		testClient.setId(1L);
-		testClient.setClientRut("12.345.678-9");
-		testClient.setClientName("Test Client");
+        // Setup test reservation
+        testReservation = new ReservationEntity();
+        testReservation.setId(1L);
+        testReservation.setMainClientRut("12.345.678-9");
+        testReservation.setStartTime(LocalDateTime.now());
+        testReservation.setEndTime(LocalDateTime.now().plusHours(1));
+        testReservation.setRiderAmount(2);
+        testReservation.setClientRuts(new ArrayList<>());
+        testReservation.getClientRuts().add("12.345.678-9");
+        testReservation.setClientList(new HashSet<>());
+        testReservation.setKartList(new HashSet<>());
+    }
 
-		// Setup test kart
-		testKart = new KartEntity();
-		testKart.setId(1L);
+    @Test
+    void whenCreateReservation_thenReservationIsSaved() {
+        // Given
+        when(clientRepository.findByClientRut(testClient.getClientRut()))
+                .thenReturn(Optional.of(testClient));
+        when(reservationRepository.save(any(ReservationEntity.class)))
+                .thenReturn(testReservation);
 
-		// Setup test reservation
-		testReservation = new ReservationEntity();
-		testReservation.setId(1L);
-		testReservation.setMainClientRut("12.345.678-9");
-		testReservation.setStartTime(LocalDateTime.now());
-		testReservation.setEndTime(LocalDateTime.now().plusHours(1));
-		testReservation.setRiderAmount(2);
-		testReservation.setClientRuts(new ArrayList<>());
-		testReservation.getClientRuts().add("12.345.678-9");
-		testReservation.setClientList(new HashSet<>());
-		testReservation.setKartList(new HashSet<>());
-	}
+        // When
+        ReservationEntity savedReservation = reservationService.createReservation(testReservation);
 
-	@Test
-	void whenCreateReservation_thenReservationIsSaved() {
-		// Given
-		when(clientRepository.findByClientRut(testClient.getClientRut()))
-				.thenReturn(Optional.of(testClient));
-		when(kartRepository.findById(1L))
-				.thenReturn(Optional.of(testKart));
-		when(kartRepository.findById(2L))
-				.thenReturn(Optional.of(testKart));
-		when(reservationRepository.save(any(ReservationEntity.class)))
-				.thenReturn(testReservation);
+        // Then
+        assertThat(savedReservation).isNotNull();
+        assertThat(savedReservation.getMainClientRut()).isEqualTo(testReservation.getMainClientRut());
+        assertThat(savedReservation.getClientList()).hasSize(1);
+    }
 
-		// When
-		ReservationEntity savedReservation = reservationService.createReservation(testReservation);
+    @Test
+    void whenCreateReservationWithInvalidClient_thenThrowException() {
+        // Given
+        when(clientRepository.findByClientRut(testClient.getClientRut()))
+                .thenReturn(Optional.empty());
 
-		// Then
-		assertThat(savedReservation).isNotNull();
-		assertThat(savedReservation.getMainClientRut()).isEqualTo(testReservation.getMainClientRut());
-		assertThat(savedReservation.getKartList()).hasSize(1);
-	}
+        // When/Then
+        assertThatThrownBy(() -> reservationService.createReservation(testReservation))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Client with RUT");
+    }
 
-	@Test
-	void whenCreateReservationWithInvalidClient_thenThrowException() {
-		// Given
-		when(clientRepository.findByClientRut(testClient.getClientRut()))
-				.thenReturn(Optional.empty());
+    @Test
+    void whenGetAllReservations_thenReturnReservationsList() {
+        // Given
+        ArrayList<ReservationEntity> reservationList = new ArrayList<>();
+        reservationList.add(testReservation);
+        when(reservationRepository.findAll()).thenReturn(reservationList);
 
-		// When/Then
-		assertThatThrownBy(() -> reservationService.createReservation(testReservation))
-				.isInstanceOf(RuntimeException.class)
-				.hasMessageContaining("Client with RUT");
-	}
+        // When
+        ArrayList<ReservationEntity> result = reservationService.getAllReservations();
 
-	@Test
-	void whenCreateReservationWithInvalidKart_thenThrowException() {
-		// Given
-		when(clientRepository.findByClientRut(testClient.getClientRut()))
-				.thenReturn(Optional.of(testClient));
-		when(kartRepository.findById(any(Long.class)))
-				.thenReturn(Optional.empty());
-
-		// When/Then
-		assertThatThrownBy(() -> reservationService.createReservation(testReservation))
-				.isInstanceOf(RuntimeException.class)
-				.hasMessageContaining("Kart not found");
-	}
-
-	@Test
-	void whenGetAllReservations_thenReturnReservationsList() {
-		// Given
-		ArrayList<ReservationEntity> reservationList = new ArrayList<>();
-		reservationList.add(testReservation);
-		when(reservationRepository.findAll()).thenReturn(reservationList);
-
-		// When
-		ArrayList<ReservationEntity> result = reservationService.getAllReservations();
-
-		// Then
-		assertThat(result).hasSize(1);
-		assertThat(result.get(0).getMainClientRut()).isEqualTo(testReservation.getMainClientRut());
-	}
+        // Then
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getMainClientRut()).isEqualTo(testReservation.getMainClientRut());
+    }
 }

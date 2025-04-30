@@ -239,7 +239,7 @@ class ReceiptServiceTest {
         assertThat(savedReceipt.getFrequentClientDiscount()).isEqualTo(-4500.0); // 30% of 15000
         assertThat(savedReceipt.getBirthdayDiscount()).isEqualTo(-7500.0); // 50% of 15000
         assertThat(savedReceipt.getHolidayDiscount()).isEqualTo(-1500.0); // 10% of 15000
-        assertThat(savedReceipt.getTotalCost()).isEqualTo(-1500.0); // All discounts applied
+        assertThat(savedReceipt.getTotalCost()).isEqualTo(0); // All discounts applied
     }
 
     @Test

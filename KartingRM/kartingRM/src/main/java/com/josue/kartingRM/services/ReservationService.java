@@ -32,14 +32,6 @@ public class ReservationService {
 			reservation.getClientList().add(client);
 		}
 
-		// Link as many karts as needed
-		for (int i = 1; i <= reservation.getRiderAmount(); i++) {
-			KartEntity kart = kartRepository.findById((long) i)
-					.orElseThrow(() -> new RuntimeException("Kart not found"));
-
-			reservation.getKartList().add(kart);
-		}
-
 		return reservationRepository.save(reservation);
 	}
 

@@ -84,6 +84,8 @@ public class ReceiptService {
 
 		// Calculating the total cost by subtracting the discount amounts from the initial cost
 		double totalCost = initialCost + groupDiscount + frequentClientDiscount + birthdayDiscount + holidayDiscount;
+		if (totalCost < 0)
+			totalCost = 0;
 
 		// Adding all the necessary data to the receipt
 		receipt.setClientName(clientName);
