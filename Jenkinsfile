@@ -22,13 +22,17 @@ pipeline {
 
         stage('Wait for Backend') {
             steps {
+                // Optionally implement a healthcheck or polling to check service readiness
+                sh 'echo "Waiting for backend to be ready..."'
                 sh 'sleep 8'
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'docker-compose exec backend_app ./mvnw test || true'
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh 'docker-compose exec backend_app ./mvnw test'
+                }
             }
         }
 
