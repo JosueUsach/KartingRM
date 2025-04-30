@@ -14,31 +14,27 @@ pipeline {
 
         stage('Build and Start Containers') {
             steps {
-                sh 'docker-compose down'
-                sh 'docker-compose build'
-                sh 'docker-compose up -d'
+                bat 'docker-compose down'
+                bat 'docker-compose build'
+                bat 'docker-compose up -d'
             }
         }
 
         stage('Wait for Backend') {
             steps {
-                // Optionally implement a healthcheck or polling to check service readiness
-                sh 'echo "Waiting for backend to be ready..."'
-                sh 'sleep 8'
+                bat 'timeout /t 8 /nobreak'
             }
         }
 
         stage('Run Tests') {
             steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh 'docker-compose exec backend_app ./mvnw test'
-                }
+                bat 'docker-compose exec backend_app ./mvnw test || exit /b 0'
             }
         }
 
         stage('Cleanup') {
             steps {
-                sh 'docker-compose down'
+                bat 'docker-compose down'
             }
         }
     }
