@@ -12,6 +12,12 @@ pipeline {
             }
         }
 
+        stage('Build Project') {
+            steps {
+                bat '.\\mvnw.cmd clean package -DskipTests'
+            }
+        }
+
         stage('Build and Start Containers') {
             steps {
                 bat 'docker-compose down'
@@ -28,7 +34,7 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                bat 'docker-compose exec backend_app ./mvnw test || exit /b 0'
+                bat 'docker-compose exec backend_app .\\mvnw.cmd test || exit /b 0'
             }
         }
 
