@@ -14,7 +14,7 @@ pipeline {
 
         stage('Build Project') {
             steps {
-                bat 'mvn clean package -DskipTests'
+                bat 'KartingRM\\kartingRM\\mvnw.cmd clean package -DskipTests'
             }
         }
 
