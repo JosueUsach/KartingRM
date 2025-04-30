@@ -410,7 +410,7 @@ const MakeReservation = () => {
 					onMouseOver={(e) => (e.target.style.backgroundColor = "#45a049")}
 					onMouseOut={(e) => (e.target.style.backgroundColor = "#4CAF50")}
 				>
-					Reservar
+					Crear reserva
 				</button>
 			</form>
 		</div>
