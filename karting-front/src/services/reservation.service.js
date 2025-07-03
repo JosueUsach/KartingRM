@@ -8,4 +8,8 @@ const getReservationsForCalendar = () => {
     return httpClient.get("/api/reservation/calendar");
 };
 
-export default { saveReservation, getReservationsForCalendar };
+const getReservationById = (id) => {
+	return httpClient.get(`/api/reservation/${id}`);
+};
+
+export default { saveReservation, getReservationsForCalendar, getReservationById };

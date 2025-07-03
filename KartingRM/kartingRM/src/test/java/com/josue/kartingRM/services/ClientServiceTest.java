@@ -17,6 +17,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 class ClientServiceTest {
 
@@ -109,30 +110,15 @@ class ClientServiceTest {
     }
 
     @Test
-    void whenDeleteClientWithReservations_thenRemoveFromReservationsAndDelete() throws Exception {
+    void whenDeleteClientWithReservations_thenClientIsDeleted() throws Exception {
         // Given
-        HashSet<ReservationEntity> reservations = new HashSet<>();
-        ReservationEntity reservation = new ReservationEntity();
-        reservation.setMainClientRut(testClient.getClientRut());
-        reservation.setClientList(new HashSet<>());
-        reservation.getClientList().add(testClient);
-        reservation.setClientRuts(new ArrayList<>());
-        reservation.getClientRuts().add(testClient.getClientRut());
-        reservations.add(reservation);
-
-        testClient.setReservationList(reservations);
-
-        when(clientRepository.findById(testClient.getId())).thenReturn(Optional.of(testClient));
+        when(clientRepository.existsById(testClient.getId())).thenReturn(true);
 
         // When
-        boolean result = clientService.deleteClient(testClient.getId());
+        clientService.deleteClient(testClient.getId());
 
         // Then
-        assertThat(result).isTrue();
-        assertThat(reservation.getMainClientRut()).isNull();
-        assertThat(reservation.getClientList()).isEmpty();
-        assertThat(reservation.getClientRuts()).isEmpty();
-        assertThat(testClient.getReservationList()).isEmpty();
+        verify(clientRepository).deleteById(testClient.getId());
     }
 
 

@@ -5,10 +5,9 @@ import receiptService from "../services/receipt.service";
 const MakeReservation = () => {
 	const [form, setForm] = useState({
 		startTime: "",
-		holidayCheck: false,
 		reservationType: 0, // 0=10min, 1=15min, 2=20min
 		riderAmount: 1,
-		clientRuts: [{ rut: "", birthdayCheck: false, frequency: 1 }],
+		clientRuts: [{ rut: "", frequency: 1 }],
 	});
 
 	const [endTime, setEndTime] = useState("");
@@ -29,7 +28,7 @@ const MakeReservation = () => {
 		const amount = Math.min(parseInt(e.target.value || 0), 15);
 		const updatedRuts = [...form.clientRuts];
 		while (updatedRuts.length < amount)
-			updatedRuts.push({ rut: "", birthdayCheck: false, frequency: 1 });
+			updatedRuts.push({ rut: "", frequency: 1 });
 		while (updatedRuts.length > amount) updatedRuts.pop();
 
 		setForm({
@@ -95,13 +94,6 @@ const MakeReservation = () => {
 		}
 
 		return formatted;
-	};
-
-	const handleHolidayChange = (e) => {
-		setForm({
-			...form,
-			holidayCheck: e.target.checked,
-		});
 	};
 
 	const validateForm = () => {
@@ -178,11 +170,9 @@ const MakeReservation = () => {
 			// Save receipts for each client
 			for (const client of form.clientRuts) {
 				const receiptData = {
-					holidayCheck: form.holidayCheck,
 					clientRut: client.rut,
-					birthdayCheck: client.birthdayCheck,
 					monthlyVisits: client.frequency,
-					reservation: { id: reservationResponse.data.id },
+					reservationId: reservationResponse.data.id,
 				};
 
 				console.log("Sending receipt data:", receiptData);
@@ -193,10 +183,9 @@ const MakeReservation = () => {
 
 			setForm({
 				startTime: "",
-				holidayCheck: false,
 				reservationType: 0,
 				riderAmount: 1,
-				clientRuts: [{ rut: "", birthdayCheck: false, frequency: 1 }],
+				clientRuts: [{ rut: "", frequency: 1 }],
 			});
 			setEndTime("");
 		} catch (error) {
@@ -272,27 +261,6 @@ const MakeReservation = () => {
 						min={new Date().toISOString().slice(0, 16)}
 					/>
 					<div style={errorStyle}>{errors.startTime}</div>
-				</div>
-
-				{/* Holiday check */}
-				<div
-					style={{
-						display: "flex",
-						alignItems: "center",
-					}}
-				>
-					<label style={{ marginRight: "1rem", fontWeight: "bold" }}>
-						Es fin de semana / feriado?
-					</label>
-					<input
-						type="checkbox"
-						checked={form.holidayCheck}
-						onChange={handleHolidayChange}
-						style={{
-							transform: "scale(1.5)",
-							margin: "0.5rem",
-						}}
-					/>
 				</div>
 
 				{/* Reservation Type */}
@@ -372,29 +340,6 @@ const MakeReservation = () => {
 										marginRight: "1rem",
 									}}
 									min={1}
-								/>
-							</div>
-							<div
-								style={{
-									display: "flex",
-									flexDirection: "column",
-									alignItems: "center",
-								}}
-							>
-								<label style={{ marginBottom: "0.2rem" }}>Cumpleaños</label>
-								<input
-									type="checkbox"
-									checked={client.birthdayCheck}
-									onChange={(e) => {
-										const updatedClients = [...form.clientRuts];
-										updatedClients[index].birthdayCheck = e.target.checked;
-										setForm({ ...form, clientRuts: updatedClients });
-									}}
-									style={{
-										transform: "scale(1.5)",
-										margin: "0.5rem",
-										marginBottom: "0.5rem",
-									}}
 								/>
 							</div>
 

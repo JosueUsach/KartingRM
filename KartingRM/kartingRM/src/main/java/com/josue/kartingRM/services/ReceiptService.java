@@ -10,10 +10,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @Transactional
@@ -25,16 +24,23 @@ public class ReceiptService {
 	@Autowired
 	private ReservationRepository reservationRepository;
 
+	private static final Set<String> holidays = new HashSet<>();
+	// Example holidays
+	static {
+		holidays.add("01-01"); // New year
+		holidays.add("12-25"); // Christmas
+		holidays.add("09-18"); // Fiestas patrias
+	}
+
 	// Input: A client, a reservation and checks for discounts
 	// Description: This method runs for every client on a reservation, it also takes data from the reservation and applies discounts for every needed check
 	// Output: A receipt in the database with all costs and discounts
 	public ReceiptEntity createReceipt(ReceiptEntity receipt) {
+		System.out.println(receipt.getClientRut() + " " + receipt.getReservationId() + " " + receipt.getMonthlyVisits());
 		ClientEntity client = clientRepository.findByClientRut(receipt.getClientRut())
 				.orElseThrow(() -> new RuntimeException("Client not found"));
-		String clientName = client.getClientName();
-		String clientEmail = client.getClientEmail();
 
-		ReservationEntity reservation = reservationRepository.findById(receipt.getReservation().getId())
+		ReservationEntity reservation = reservationRepository.findById(receipt.getReservationId())
 				.orElseThrow(() -> new RuntimeException("Reservation not found"));
 		// Initial cost depends on the number of laps / max time
 		double initialCost = 0;
@@ -66,15 +72,18 @@ public class ReceiptService {
 		else if (monthlyVisits >= 7)
 			frequentClientDiscount = 0.3; // 30% off
 
-		// Birthday discount calculation
-		double birthdayDiscount = 0;
-		if (receipt.isBirthdayCheck())
+		LocalDateTime date = reservation.getStartTime();
+		double birthdayDiscount = 0.0;
+		if (client.getClientBirthDate().getDayOfMonth() == date.getDayOfMonth()
+				&& client.getClientBirthDate().getMonthValue() == date.getMonthValue())
 			birthdayDiscount = 0.5; // 50% off
 
 		// Holiday discount calculation
 		double holidayDiscount = 0;
-		if (receipt.isHolidayCheck())
-			holidayDiscount = 0.1; // 10% off
+		DayOfWeek dayOfWeek = date.getDayOfWeek();
+		String monthDay = String.format("%02d-%02d", date.getMonthValue(), date.getDayOfMonth());
+		if  (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY || holidays.contains(monthDay))
+			holidayDiscount = 0.1;
 
 		// Updating every discount to reflect how much it subtracted from the initial cost
 		groupDiscount = -(initialCost * groupDiscount);
@@ -88,6 +97,8 @@ public class ReceiptService {
 			totalCost = 0;
 
 		// Adding all the necessary data to the receipt
+		String clientName = client.getClientName();
+		String clientEmail = client.getClientEmail();
 		receipt.setClientName(clientName);
 		receipt.setClientEmail(clientEmail);
 		receipt.setInitialCost(initialCost);
@@ -96,10 +107,6 @@ public class ReceiptService {
 		receipt.setBirthdayDiscount(birthdayDiscount);
 		receipt.setHolidayDiscount(holidayDiscount);
 		receipt.setTotalCost(totalCost);
-		receipt.setReservation(reservation);
-
-		receipt.setReservation(reservation);
-		reservation.getReceipts().add(receipt);
 
 		return receiptRepository.save(receipt);
 	}
@@ -147,5 +154,16 @@ public class ReceiptService {
 		}
 
 		return report;
+	}
+
+	// Input: A client's Rut and a reservation's ID
+	// Description: Finds the receipt for the client in the reservation
+	// Output: The correct receipt
+	public ReceiptEntity findByRutAndReservationId(String clientRut, Long reservationId) {
+		ReceiptEntity receipt = receiptRepository.findByClientRutAndReservationId(clientRut, reservationId);
+		if (receipt != null)
+			return receipt;
+		else
+			throw new RuntimeException("Receipt with client RUT " + clientRut + " and reservation ID " + reservationId + " not found");
 	}
 }

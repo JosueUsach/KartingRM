@@ -10,6 +10,8 @@ import java.util.List;
 @Repository
 public interface ReceiptRepository extends JpaRepository<ReceiptEntity, Long> {
 
+	ReceiptEntity findByClientRutAndReservationId(String rut, Long reservationId);
+
 	@Query(value = "SELECT " +
 			"CASE " +
 			"   WHEN initial_cost = 15000 THEN '10 vueltas o máx 10 min' " +

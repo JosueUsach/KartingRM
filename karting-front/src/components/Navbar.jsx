@@ -32,7 +32,7 @@ function Navbar() {
 	};
 
 	return (
-		<AppBar position="static" sx={{ backgroundColor: "#d03434" }}>
+		<AppBar position="fixed" sx={{ backgroundColor: "#d03434" }}>
 			<Container maxWidth="xl">
 				<Toolbar disableGutters>
 					<SportsMotorsportsIcon

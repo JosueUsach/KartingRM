@@ -25,6 +25,17 @@ public class ReceiptController {
 		return ResponseEntity.ok(receipts);
 	}
 
+	@GetMapping("/search")
+	public ResponseEntity<ReceiptEntity> getReservationByRutAndReservationId(
+			@RequestParam String clientRut,
+			@RequestParam Long reservationId) {
+		ReceiptEntity receipt = receiptService.findByRutAndReservationId(clientRut, reservationId);
+		if (receipt != null) {
+			return ResponseEntity.ok(receipt);
+		}
+		return ResponseEntity.notFound().build();
+	}
+
 	@PostMapping("/")
 	public ResponseEntity<ReceiptEntity> createReceipt(@RequestBody ReceiptEntity receipt) {
 		ReceiptEntity newReceipt = receiptService.createReceipt(receipt);

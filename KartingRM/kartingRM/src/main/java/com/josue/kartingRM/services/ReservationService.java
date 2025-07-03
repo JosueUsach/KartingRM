@@ -1,10 +1,8 @@
 package com.josue.kartingRM.services;
 
 import com.josue.kartingRM.entities.ClientEntity;
-import com.josue.kartingRM.entities.KartEntity;
 import com.josue.kartingRM.entities.ReservationEntity;
 import com.josue.kartingRM.repositories.ClientRepository;
-import com.josue.kartingRM.repositories.KartRepository;
 import com.josue.kartingRM.repositories.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,19 +15,14 @@ public class ReservationService {
 	private ReservationRepository reservationRepository;
 	@Autowired
 	private ClientRepository clientRepository;
-	@Autowired
-	private KartRepository kartRepository;
 
 	// Input: A reservation object
 	// Description: Adds the inputted reservation to the DB and links all clients to it
 	// Output: A saved reservation
 	public ReservationEntity createReservation(ReservationEntity reservation) {
-		// Link each client by RUT before saving the reservation
 		for (String rut : reservation.getClientRuts()) {
-			ClientEntity client = clientRepository.findByClientRut(rut)
+			clientRepository.findByClientRut(rut)
 					.orElseThrow(() -> new RuntimeException("Client with RUT " + rut + " not found"));
-
-			reservation.getClientList().add(client);
 		}
 
 		return reservationRepository.save(reservation);
@@ -39,6 +32,14 @@ public class ReservationService {
 	// Output: An array of reservations
 	public ArrayList<ReservationEntity> getAllReservations() {
 		return (ArrayList<ReservationEntity>) reservationRepository.findAll();
+	}
+
+	// Input: An ID
+	// Description: Finds the reservation with the corresponding ID
+	// Output: The correct reservation
+	public ReservationEntity findReservationById(Long id) {
+		return reservationRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("Reservation with ID " + id + " not found"));
 	}
 
 }

@@ -21,7 +21,4 @@ public class KartEntity {
 
 	private String model;
 	private boolean available;
-
-	@ManyToMany(mappedBy = "kartList")
-	private Set<ReservationEntity> reservationList = new HashSet<>();
 }

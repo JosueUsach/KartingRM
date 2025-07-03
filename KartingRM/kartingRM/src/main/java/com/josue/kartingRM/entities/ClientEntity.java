@@ -27,8 +27,4 @@ public class ClientEntity {
 	private String clientEmail;
 	private String clientPhone;
 	private LocalDate clientBirthDate;
-
-	@ManyToMany(mappedBy = "clientList")
-	@JsonIgnore
-	private Set<ReservationEntity> reservationList = new HashSet<>();
 }

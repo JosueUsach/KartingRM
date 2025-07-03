@@ -13,6 +13,7 @@ function App() {
 	return (
 		<Router>
 			<Navbar />
+			<div style={{ height: 64 }} />{" "}
 			<main>
 				<Routes>
 					<Route path="/" element={<Home />} />

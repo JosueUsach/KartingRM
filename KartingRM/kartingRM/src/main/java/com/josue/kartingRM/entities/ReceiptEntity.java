@@ -22,18 +22,18 @@ public class ReceiptEntity {
 	private String clientRut;
 	private String clientName;
 	private String clientEmail;
+
+	private int monthlyVisits;
+	private boolean birthdayCheck;
+
 	private double initialCost;
 	private double groupDiscount;
-	private LocalDateTime date;
-	private int monthlyVisits;
 	private double frequentClientDiscount;
-	private boolean birthdayCheck;
 	private double birthdayDiscount;
-	private boolean holidayCheck;
 	private double holidayDiscount;
 	private double totalCost;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "reservation_id")
-	private ReservationEntity reservation;
+	private LocalDateTime date;
+
+	private Long reservationId;
 }

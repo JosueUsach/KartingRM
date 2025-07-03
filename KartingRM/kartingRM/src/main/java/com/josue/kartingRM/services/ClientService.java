@@ -48,26 +48,10 @@ public class ClientService {
 	// Input: A client's ID
 	// Description: Removes the client from all reservations and then deletes the client
 	// Output: A boolean for if the removal works
-	public boolean deleteClient(Long id) throws Exception {
-		try {
-			ClientEntity client = clientRepository.findById(id)
-					.orElseThrow(() -> new Exception("Client not found"));
-
-			for (ReservationEntity reservation : client.getReservationList()) {
-				reservation.getClientList().remove(client);
-				if (reservation.getMainClientRut().equals(client.getClientRut())) {
-					reservation.setMainClientRut(null);
-				}
-				reservation.getClientRuts().remove(client.getClientRut());
-			}
-
-			client.getReservationList().clear();
-
+	public void deleteClient(Long id) throws Exception {
+		if (clientRepository.existsById(id))
 			clientRepository.deleteById(id);
-			return true;
-
-		} catch (Exception e) {
-			throw new Exception("Error deleting client");
-		}
+		else
+			throw new Exception("Client not found");
 	}
 }

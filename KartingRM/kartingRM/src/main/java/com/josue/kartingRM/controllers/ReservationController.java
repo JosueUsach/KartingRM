@@ -1,6 +1,8 @@
 package com.josue.kartingRM.controllers;
 
+import com.josue.kartingRM.entities.ReceiptEntity;
 import com.josue.kartingRM.entities.ReservationEntity;
+import com.josue.kartingRM.services.ReceiptService;
 import com.josue.kartingRM.services.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +19,19 @@ import java.util.stream.Collectors;
 public class ReservationController {
 	@Autowired
 	ReservationService reservationService;
+	@Autowired
+	private ReceiptService receiptService;
 
 	@GetMapping("/")
 	public ResponseEntity<List<ReservationEntity>> listReservations() {
 		List<ReservationEntity> reservations = reservationService.getAllReservations();
 		return ResponseEntity.ok(reservations);
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<ReservationEntity> getReservationById(@PathVariable Long id) {
+		ReservationEntity reservation = reservationService.findReservationById(id);
+		return ResponseEntity.ok(reservation);
 	}
 
 	@PostMapping("/")

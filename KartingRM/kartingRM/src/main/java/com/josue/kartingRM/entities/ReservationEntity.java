@@ -35,26 +35,4 @@ public class ReservationEntity {
 	@Column(name = "clientRuts")
 	private List<String> clientRuts = new ArrayList<>();
 
-	@OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ReceiptEntity> receipts = new ArrayList<>();
-
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JsonIgnore
-	@JoinTable(
-			name = "client_reservation",
-			joinColumns = @JoinColumn(name = "reservation_id"),
-			inverseJoinColumns = @JoinColumn(name = "client_id")
-	)
-	private Set<ClientEntity> clientList = new HashSet<>();
-
-
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JsonIgnore
-	@JoinTable(
-			name = "kart_reservation",
-			joinColumns = @JoinColumn(name = "reservation_id"),
-			inverseJoinColumns = @JoinColumn(name = "kart_id")
-	)
-	private Set<KartEntity> kartList = new HashSet<>();
-
 }

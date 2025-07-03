@@ -28,9 +28,8 @@ public class ClientController {
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<ClientEntity> deleteClient(@PathVariable Long id) throws Exception {
-		var isDeleted = clientService.deleteClient(id);
-		return ResponseEntity.noContent().build();
+	public void deleteClient(@PathVariable Long id) throws Exception {
+		clientService.deleteClient(id);
 	}
 
 	@PostMapping("/")
