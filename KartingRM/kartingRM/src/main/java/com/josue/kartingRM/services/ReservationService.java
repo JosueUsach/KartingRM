@@ -6,15 +6,19 @@ import com.josue.kartingRM.repositories.ClientRepository;
 import com.josue.kartingRM.repositories.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 
 @Service
+@Transactional
 public class ReservationService {
 	@Autowired
 	private ReservationRepository reservationRepository;
 	@Autowired
 	private ClientRepository clientRepository;
+    @Autowired
+    private ReceiptService receiptService;
 
 	// Input: A reservation object
 	// Description: Adds the inputted reservation to the DB and links all clients to it
@@ -42,4 +46,11 @@ public class ReservationService {
 				.orElseThrow(() -> new RuntimeException("Reservation with ID " + id + " not found"));
 	}
 
+    public void deleteReservation(Long reservationId) {
+        // First delete all associated receipts
+        receiptService.deleteReceiptByReservationId(reservationId);
+        
+        // Then delete the reservation
+        reservationRepository.deleteById(reservationId);
+    }
 }

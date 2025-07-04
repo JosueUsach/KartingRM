@@ -36,7 +36,6 @@ public class ReceiptService {
 	// Description: This method runs for every client on a reservation, it also takes data from the reservation and applies discounts for every needed check
 	// Output: A receipt in the database with all costs and discounts
 	public ReceiptEntity createReceipt(ReceiptEntity receipt) {
-		System.out.println(receipt.getClientRut() + " " + receipt.getReservationId() + " " + receipt.getMonthlyVisits());
 		ClientEntity client = clientRepository.findByClientRut(receipt.getClientRut())
 				.orElseThrow(() -> new RuntimeException("Client not found"));
 
@@ -166,4 +165,11 @@ public class ReceiptService {
 		else
 			throw new RuntimeException("Receipt with client RUT " + clientRut + " and reservation ID " + reservationId + " not found");
 	}
+
+	// Input: A reservation ID
+	// Description: Finds every receipt involved in that reservation and deletes it
+    public void deleteReceiptByReservationId(Long reservationId) {
+        List<ReceiptEntity> receipts = receiptRepository.findByReservationId(reservationId);
+        receiptRepository.deleteAll(receipts);
+    }
 }

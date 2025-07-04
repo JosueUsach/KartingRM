@@ -17,7 +17,7 @@ const MakeReservation = () => {
 		if (!form.startTime) return;
 
 		const start = new Date(form.startTime);
-		const durationMap = [10, 15, 20];
+		const durationMap = [30, 35, 40]; // Durations in minutes for 10, 15, and 20 minutes, considering setup time
 		const end = new Date(
 			start.getTime() + durationMap[form.reservationType] * 60000
 		);
@@ -109,6 +109,25 @@ const MakeReservation = () => {
 		} else if (selectedStart < now) {
 			newErrors.startTime = "Tiempo de inicio no puede ser en el pasado";
 			valid = false;
+		} else {
+			// Restrict hours by day of week
+			const day = selectedStart.getDay(); // 0=Sunday, 6=Saturday
+			const hour = selectedStart.getHours();
+			if (day === 0 || day === 6) {
+				// Saturday or Sunday: 10:00 to 22:00
+				if (hour < 10 || hour >= 22) {
+					newErrors.startTime =
+						"Solo se puede reservar entre 10:00 y 22:00 los fines de semana";
+					valid = false;
+				}
+			} else {
+				// Weekdays: 14:00 to 22:00
+				if (hour < 14 || hour >= 22) {
+					newErrors.startTime =
+						"Solo se puede reservar entre 14:00 y 22:00 de lunes a viernes";
+					valid = false;
+				}
+			}
 		}
 
 		if (form.riderAmount < 1 || form.riderAmount > 15) {

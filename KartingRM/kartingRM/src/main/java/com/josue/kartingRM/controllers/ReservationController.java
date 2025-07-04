@@ -54,4 +54,13 @@ public class ReservationController {
 		}).collect(Collectors.toList());
 	}
 
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {
+		try {
+			reservationService.deleteReservation(id);
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			return ResponseEntity.notFound().build();
+		}
+	}
 }

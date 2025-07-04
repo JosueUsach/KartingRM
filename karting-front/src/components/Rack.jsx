@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid"; // <-- Add this import
 import reservationService from "../services/reservation.service";
 import receiptService from "../services/receipt.service";
 
@@ -64,6 +65,22 @@ const Rack = () => {
 	const closeReceiptOverlay = () => {
 		setShowReceiptOverlay(false);
 		setReceiptDetails(null);
+	};
+
+	const handleDeleteReservation = async (reservationId) => {
+		if (!window.confirm("¿Estás seguro de que deseas eliminar esta reserva?"))
+			return;
+		try {
+			await reservationService.deleteReservation(reservationId);
+			alert("Reserva eliminada correctamente.");
+			setShowOverlay(false);
+			setReservationDetails(null);
+			// Refresh events
+			const response = await reservationService.getReservationsForCalendar();
+			setEvents(response.data);
+		} catch (error) {
+			alert("No se pudo eliminar la reserva.");
+		}
 	};
 
 	const calendarStyles = {
@@ -169,18 +186,39 @@ const Rack = () => {
 	return (
 		<div style={calendarStyles.container}>
 			<h2 style={calendarStyles.header}>Calendario de Reservas</h2>
+			<style>
+				{`
+        .fc .fc-timegrid-slot-label {
+            color: #000 !important;
+            font-weight: bold;
+        }
+        .fc .fc-event {
+            background: #8b0000 !important;
+            color: #fff !important;
+            border: none !important;
+            text-align: center;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+    `}
+			</style>
 			<FullCalendar
-				plugins={[dayGridPlugin]}
-				initialView="dayGridMonth"
+				plugins={[dayGridPlugin, timeGridPlugin]}
+				initialView="timeGridWeek"
 				events={events}
 				locale="es"
+				firstDay={1}
 				headerToolbar={{
 					left: "prev,next today",
 					center: "customTitle",
-					right: "dayGridMonth,dayGridWeek,dayGridDay",
+					right: "dayGridMonth,timeGridWeek,timeGridDay",
+				}}
+				slotLabelFormat={{
+					hour: "2-digit",
+					minute: "2-digit",
+					hour12: false,
 				}}
 				datesSet={(dateInfo) => {
-					// Use FullCalendar's built-in title for the current view
 					const title = dateInfo.view.title;
 					const titleButton = document.querySelector(".fc-customTitle-button");
 					if (titleButton) {
@@ -196,15 +234,10 @@ const Rack = () => {
 				height="auto"
 				contentHeight="auto"
 				dayCellClassNames={() => calendarStyles.dayCell}
-				dayCellContent={(content) => {
-					return (
-						<div style={{ color: "black", fontWeight: "bold" }}>
-							{content.dayNumberText}
-						</div>
-					);
-				}}
-				eventContent={(eventInfo) => (
-					<div style={calendarStyles.event}>{eventInfo.event.title}</div>
+				dayCellContent={(content) => (
+					<div style={{ color: "black", fontWeight: "bold" }}>
+						{content.dayNumberText}
+					</div>
 				)}
 				eventClick={handleEventClick}
 				buttonText={{
@@ -283,6 +316,22 @@ const Rack = () => {
 										</li>
 									))}
 								</ul>
+								<button
+									style={{
+										...calendarStyles.button,
+										backgroundColor: "#b00020",
+										marginTop: "1rem",
+										alignItems: "center",
+										justifyContent: "center",
+										gap: "0.5rem",
+									}}
+									onClick={() => handleDeleteReservation(reservationDetails.id)}
+								>
+									<span role="img" aria-label="Eliminar">
+										🗑️
+									</span>
+									Eliminar reserva
+								</button>
 							</div>
 						) : null}
 					</div>
@@ -326,7 +375,7 @@ const Rack = () => {
 								</p>
 								<p>
 									<strong>¿Cumpleaños?:</strong>{" "}
-									{receiptDetails.birthdayCheck ? "Sí" : "No"}
+									{receiptDetails.birthdayDiscount < 0 ? "Sí" : "No"}
 								</p>
 								<p>
 									<strong>Costo Inicial:</strong> $

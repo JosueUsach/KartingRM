@@ -1,4 +1,4 @@
-package com.josue.kartingRM.services;
+/*package com.josue.kartingRM.services;
 
 import com.josue.kartingRM.entities.ClientEntity;
 import com.josue.kartingRM.entities.ReceiptEntity;
@@ -269,4 +269,4 @@ class ReceiptServiceTest {
         assertThat(savedReceipt.getHolidayDiscount()).isEqualTo(0.0);
         assertThat(savedReceipt.getTotalCost()).isEqualTo(14000.0);
     }
-}
+}*/

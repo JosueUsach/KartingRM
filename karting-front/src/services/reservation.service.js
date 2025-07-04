@@ -12,4 +12,8 @@ const getReservationById = (id) => {
 	return httpClient.get(`/api/reservation/${id}`);
 };
 
-export default { saveReservation, getReservationsForCalendar, getReservationById };
+const deleteReservation = (id) => {
+	return httpClient.delete(`/api/reservation/${id}`);
+};
+
+export default { saveReservation, getReservationsForCalendar, getReservationById, deleteReservation };

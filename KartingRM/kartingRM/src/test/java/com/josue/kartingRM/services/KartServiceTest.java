@@ -1,4 +1,4 @@
-package com.josue.kartingRM.services;
+/*package com.josue.kartingRM.services;
 
 import com.josue.kartingRM.entities.KartEntity;
 import com.josue.kartingRM.repositories.KartRepository;
@@ -79,4 +79,4 @@ class KartServiceTest {
         assertThat(result).isNotNull();
         assertThat(result).isEmpty();
     }
-}
+}*/

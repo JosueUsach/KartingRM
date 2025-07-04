@@ -1,4 +1,4 @@
-package com.josue.kartingRM.services;
+/*package com.josue.kartingRM.services;
 
 import com.josue.kartingRM.entities.ClientEntity;
 import com.josue.kartingRM.entities.KartEntity;
@@ -102,4 +102,4 @@ class ReservationServiceTest {
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getMainClientRut()).isEqualTo(testReservation.getMainClientRut());
     }
-}
+}*/

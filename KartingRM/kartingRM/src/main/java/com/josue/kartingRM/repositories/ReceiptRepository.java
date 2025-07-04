@@ -69,4 +69,6 @@ public interface ReceiptRepository extends JpaRepository<ReceiptEntity, Long> {
 			"FROM receipt", nativeQuery = true)
 	List<Object[]> getRiderGroupSizeReport();
 
+    void deleteByReservationId(Long reservationId);
+    List<ReceiptEntity> findByReservationId(Long reservationId);
 }
