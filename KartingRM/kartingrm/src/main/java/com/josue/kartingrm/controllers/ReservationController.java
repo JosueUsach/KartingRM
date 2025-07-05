@@ -18,8 +18,6 @@ import java.util.stream.Collectors;
 public class ReservationController {
 	@Autowired
 	ReservationService reservationService;
-	@Autowired
-	private ReceiptService receiptService;
 
 	@GetMapping("/")
 	public ResponseEntity<List<ReservationEntity>> listReservations() {

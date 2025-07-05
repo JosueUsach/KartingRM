@@ -27,7 +27,7 @@ public class ClientService {
 	// Description: Finds all clients and puts them in an array
 	// Output: An array of clients
 	public List<ClientEntity> getAllClients() {
-		return (List<ClientEntity>) clientRepository.findAll();
+		return clientRepository.findAll();
 	}
 
 	// Input: An email
