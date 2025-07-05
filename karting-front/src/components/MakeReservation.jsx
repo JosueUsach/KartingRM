@@ -12,6 +12,11 @@ const MakeReservation = () => {
 
 	const [endTime, setEndTime] = useState("");
 	const [errors, setErrors] = useState({});
+	const [toast, setToast] = useState({
+		show: false,
+		message: "",
+		type: "error",
+	});
 
 	useEffect(() => {
 		if (!form.startTime) return;
@@ -23,6 +28,13 @@ const MakeReservation = () => {
 		);
 		setEndTime(end.toISOString());
 	}, [form.startTime, form.reservationType]);
+
+	useEffect(() => {
+		if (toast.show) {
+			const timer = setTimeout(() => setToast({ ...toast, show: false }), 3500);
+			return () => clearTimeout(timer);
+		}
+	}, [toast]);
 
 	const handleRiderAmountChange = (e) => {
 		const amount = Math.min(parseInt(e.target.value || 0), 15);
@@ -135,6 +147,16 @@ const MakeReservation = () => {
 			valid = false;
 		}
 
+		// Check for unique RUTs
+		const rutList = form.clientRuts.map((client) =>
+			client.rut.trim().toUpperCase()
+		);
+		const rutSet = new Set(rutList);
+		if (rutSet.size !== rutList.length) {
+			newErrors.clientRuts = "Cada RUT debe ser único";
+			valid = false;
+		}
+
 		form.clientRuts.forEach((client, index) => {
 			if (!client.rut) {
 				newErrors[`clientRut_${index}`] = `Rut del cliente ${
@@ -198,7 +220,11 @@ const MakeReservation = () => {
 				await receiptService.saveReceipt(receiptData);
 			}
 
-			alert("Reserva y comprobantes guardados!");
+			setToast({
+				show: true,
+				message: "Reserva y comprobantes guardados!",
+				type: "success",
+			});
 
 			setForm({
 				startTime: "",
@@ -214,7 +240,10 @@ const MakeReservation = () => {
 				data: error.response?.data,
 				config: error.config,
 			});
-			alert(`Error: ${error.response?.data?.message || error.message}`);
+			const backendMsg =
+				error.response?.data?.message ||
+				"Error al crear la reserva. Verifique los datos e intente nuevamente.";
+			setToast({ show: true, message: backendMsg, type: "error" });
 		}
 	};
 
@@ -255,9 +284,27 @@ const MakeReservation = () => {
 		transition: "all 0.3s ease",
 	};
 
+	const toastStyle = {
+		position: "fixed",
+		bottom: "30px",
+		left: "50%",
+		transform: "translateX(-50%)",
+		background: toast.type === "success" ? "#4CAF50" : "#d03434",
+		color: "white",
+		padding: "1rem 2rem",
+		borderRadius: "8px",
+		boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+		fontSize: "1.1rem",
+		zIndex: 9999,
+		transition: "opacity 0.3s",
+		opacity: toast.show ? 1 : 0,
+		pointerEvents: "none",
+	};
+
 	return (
 		<div style={{ padding: "2rem", textAlign: "center" }}>
 			<h2 style={{ fontSize: "2.2rem" }}>Reservar hora</h2>
+			{toast.show && <div style={toastStyle}>{toast.message}</div>}
 			<form
 				onSubmit={handleSubmit}
 				style={{
@@ -365,6 +412,17 @@ const MakeReservation = () => {
 							<div style={errorStyle}>{errors[`clientRut_${index}`]}</div>
 						</div>
 					))}
+					{errors.clientRuts && (
+						<div
+							style={{
+								color: "red",
+								fontSize: "0.95rem",
+								marginBottom: "0.5rem",
+							}}
+						>
+							{errors.clientRuts}
+						</div>
+					)}
 				</div>
 
 				{/* Submit Button */}

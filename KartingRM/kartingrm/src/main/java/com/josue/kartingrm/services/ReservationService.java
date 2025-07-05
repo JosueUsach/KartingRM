@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Transactional
@@ -16,16 +17,25 @@ public class ReservationService {
 	private ReservationRepository reservationRepository;
 	@Autowired
 	private ClientRepository clientRepository;
-    @Autowired
-    private ReceiptService receiptService;
+	@Autowired
+	private ReceiptService receiptService;
 
 	// Input: A reservation object
 	// Description: Adds the inputted reservation to the DB and links all clients to it
 	// Output: A saved reservation
 	public ReservationEntity createReservation(ReservationEntity reservation) {
+		// Check if all clients exist
 		for (String rut : reservation.getClientRuts()) {
 			clientRepository.findByClientRut(rut)
 					.orElseThrow(() -> new RuntimeException("Client with RUT " + rut + " not found"));
+		}
+
+        // Check for overlapping reservations
+        List<ReservationEntity> overlappingReservations = reservationRepository
+                .findOverlappingReservations(reservation.getStartTime(), reservation.getEndTime());
+
+        if (!overlappingReservations.isEmpty()) {
+				throw new RuntimeException("Cannot create reservation: Time slot overlaps with existing reservation(s)");
 		}
 
 		return reservationRepository.save(reservation);
@@ -45,11 +55,11 @@ public class ReservationService {
 				.orElseThrow(() -> new RuntimeException("Reservation with ID " + id + " not found"));
 	}
 
-    public void deleteReservation(Long reservationId) {
-        // First delete all associated receipts
-        receiptService.deleteReceiptByReservationId(reservationId);
-        
-        // Then delete the reservation
-        reservationRepository.deleteById(reservationId);
+	public void deleteReservation(Long reservationId) {
+		// First delete all associated receipts
+		receiptService.deleteReceiptByReservationId(reservationId);
+
+		// Then delete the reservation
+		reservationRepository.deleteById(reservationId);
     }
 }

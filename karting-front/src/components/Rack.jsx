@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid"; // <-- Add this import
+import timeGridPlugin from "@fullcalendar/timegrid";
 import reservationService from "../services/reservation.service";
 import receiptService from "../services/receipt.service";
 
@@ -15,6 +15,37 @@ const Rack = () => {
 	const [receiptDetails, setReceiptDetails] = useState(null);
 	const [loadingReceipt, setLoadingReceipt] = useState(false);
 
+	const [toast, setToast] = useState({
+		show: false,
+		message: "",
+		type: "error",
+	});
+
+	// Toast auto-hide
+	useEffect(() => {
+		if (toast.show) {
+			const timer = setTimeout(() => setToast({ ...toast, show: false }), 3000);
+			return () => clearTimeout(timer);
+		}
+	}, [toast]);
+
+	const toastStyle = {
+		position: "fixed",
+		bottom: "30px",
+		left: "50%",
+		transform: "translateX(-50%)",
+		background: toast.type === "success" ? "#4CAF50" : "#d03434",
+		color: "white",
+		padding: "1rem 2rem",
+		borderRadius: "8px",
+		boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+		fontSize: "1.1rem",
+		zIndex: 9999,
+		transition: "opacity 0.3s",
+		opacity: toast.show ? 1 : 0,
+		pointerEvents: "none",
+	};
+
 	// Fetch reservations on component mount
 	useEffect(() => {
 		reservationService
@@ -24,7 +55,11 @@ const Rack = () => {
 			})
 			.catch((error) => {
 				console.error("Error fetching reservations:", error);
-				alert("Hubo un error al cargar las reservas.");
+				setToast({
+					show: true,
+					message: "Hubo un error al cargar las reservas.",
+					type: "error",
+				});
 			});
 	}, []);
 
@@ -72,14 +107,22 @@ const Rack = () => {
 			return;
 		try {
 			await reservationService.deleteReservation(reservationId);
-			alert("Reserva eliminada correctamente.");
+			setToast({
+				show: true,
+				message: "Reserva eliminada correctamente.",
+				type: "success",
+			});
 			setShowOverlay(false);
 			setReservationDetails(null);
 			// Refresh events
 			const response = await reservationService.getReservationsForCalendar();
 			setEvents(response.data);
 		} catch (error) {
-			alert("No se pudo eliminar la reserva.");
+			setToast({
+				show: true,
+				message: "No se pudo eliminar la reserva.",
+				type: "error",
+			});
 		}
 	};
 
@@ -185,6 +228,7 @@ const Rack = () => {
 
 	return (
 		<div style={calendarStyles.container}>
+			{toast.show && <div style={toastStyle}>{toast.message}</div>}
 			<h2 style={calendarStyles.header}>Calendario de Reservas</h2>
 			<style>
 				{`
@@ -218,6 +262,8 @@ const Rack = () => {
 					minute: "2-digit",
 					hour12: false,
 				}}
+				slotMinTime="10:00:00"
+				slotMaxTime="22:00:00"
 				datesSet={(dateInfo) => {
 					const title = dateInfo.view.title;
 					const titleButton = document.querySelector(".fc-customTitle-button");
