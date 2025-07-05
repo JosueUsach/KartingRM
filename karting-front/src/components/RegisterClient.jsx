@@ -11,6 +11,11 @@ const RegisterClient = () => {
 	});
 
 	const [errors, setErrors] = useState({});
+	const [toast, setToast] = useState({
+		show: false,
+		message: "",
+		type: "success",
+	});
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
@@ -118,13 +123,18 @@ const RegisterClient = () => {
 			.then((res) => {
 				console.log("Registro", res);
 				if (res.data == "") {
-					console.log("El cliente ya está registrado con ese correo o RUT.");
-					alert("El cliente ya está registrado con ese correo o RUT.");
+					setToast({
+						show: true,
+						message: "El cliente ya está registrado con ese correo o RUT.",
+						type: "error",
+					});
 					return;
 				}
-
-				console.log("Cliente registrado!:", res.data);
-				alert("Cliente registrado!");
+				setToast({
+					show: true,
+					message: "Cliente registrado!",
+					type: "success",
+				});
 				setForm({
 					clientRut: "",
 					clientName: "",
@@ -134,10 +144,21 @@ const RegisterClient = () => {
 				});
 			})
 			.catch((err) => {
-				console.error("Registro fallido:", err);
-				alert("Ocurrió un error al registrar el cliente.");
+				setToast({
+					show: true,
+					message: "Ocurrió un error al registrar el cliente.",
+					type: "error",
+				});
 			});
 	};
+
+	// Toast auto-hide effect
+	React.useEffect(() => {
+		if (toast.show) {
+			const timer = setTimeout(() => setToast({ ...toast, show: false }), 3000);
+			return () => clearTimeout(timer);
+		}
+	}, [toast]);
 
 	const inputStyle = {
 		padding: "0.5rem",
@@ -159,8 +180,26 @@ const RegisterClient = () => {
 		marginTop: "0.2rem",
 	};
 
+	const toastStyle = {
+		position: "fixed",
+		bottom: "30px", // Changed from top to bottom
+		left: "50%",
+		transform: "translateX(-50%)",
+		background: toast.type === "success" ? "#4CAF50" : "#d03434",
+		color: "white",
+		padding: "1rem 2rem",
+		borderRadius: "8px",
+		boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+		fontSize: "1.1rem",
+		zIndex: 9999,
+		transition: "opacity 0.3s",
+		opacity: toast.show ? 1 : 0,
+		pointerEvents: "none",
+	};
+
 	return (
 		<div style={{ padding: "2rem", textAlign: "center" }}>
+			{toast.show && <div style={toastStyle}>{toast.message}</div>}
 			<h2 style={{ fontSize: "2.2rem" }}>Registrar Cliente</h2>
 			<form
 				onSubmit={handleSubmit}
