@@ -3,7 +3,6 @@ package com.josue.kartingrm.controllers;
 import com.josue.kartingrm.entities.ReceiptEntity;
 import com.josue.kartingrm.repositories.ReceiptRepository;
 import com.josue.kartingrm.services.ReceiptService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,12 +11,16 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/receipt")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173/")
 public class ReceiptController {
-	@Autowired
+	final
 	ReceiptRepository receiptRepository;
-	@Autowired
-	private ReceiptService receiptService;
+	private final ReceiptService receiptService;
+
+	public ReceiptController(ReceiptRepository receiptRepository, ReceiptService receiptService) {
+		this.receiptRepository = receiptRepository;
+		this.receiptService = receiptService;
+	}
 
 	@GetMapping("/")
 	public ResponseEntity<List<ReceiptEntity>> listReceipts() {

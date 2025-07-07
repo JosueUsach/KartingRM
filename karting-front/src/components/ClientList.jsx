@@ -2,9 +2,62 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import clientService from "../services/client.service";
 
+// Overlay component for messages
+function MessageOverlay({ show, message, onClose }) {
+	if (!show) return null;
+	const modalOverlayStyle = {
+		position: "fixed",
+		top: 0,
+		left: 0,
+		width: "100vw",
+		height: "100vh",
+		background: "rgba(0,0,0,0.4)",
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
+		zIndex: 9999,
+	};
+	const modalContentStyle = {
+		background: "white",
+		padding: "2rem",
+		borderRadius: "10px",
+		minWidth: "320px",
+		maxWidth: "90vw",
+		boxShadow: "0 4px 24px rgba(0,0,0,0.2)",
+		color: "black",
+		textAlign: "center",
+	};
+	return (
+		<div style={modalOverlayStyle} data-testid="clientlist-message-overlay">
+			<div style={modalContentStyle}>
+				<p style={{ fontWeight: "bold", fontSize: "1.2rem" }}>{message}</p>
+				<button
+					onClick={onClose}
+					style={{
+						marginTop: "1.5rem",
+						padding: "0.5rem 1.5rem",
+						background: "#8b0000",
+						color: "white",
+						border: "none",
+						borderRadius: "5px",
+						fontWeight: "bold",
+						cursor: "pointer",
+						fontSize: "1rem",
+					}}
+					data-testid="clientlist-message-close"
+				>
+					Cerrar
+				</button>
+			</div>
+		</div>
+	);
+}
+
 const ClientList = () => {
 	const [clients, setClients] = useState([]);
 	const [editingClient, setEditingClient] = useState(null);
+	const [message, setMessage] = useState({ show: false, message: "" });
+	const [editErrors, setEditErrors] = useState({});
 
 	useEffect(() => {
 		fetchClients();
@@ -29,11 +82,17 @@ const ClientList = () => {
 				.deleteClient(clientId)
 				.then(() => {
 					setClients(clients.filter((client) => client.id !== clientId));
-					alert("Cliente eliminado exitosamente.");
+					setMessage({
+						show: true,
+						message: "Cliente eliminado exitosamente.",
+					});
 				})
 				.catch((error) => {
 					console.error("Error deleting client:", error);
-					alert("Hubo un error al eliminar el cliente.");
+					setMessage({
+						show: true,
+						message: "Hubo un error al eliminar el cliente.",
+					});
 				});
 		}
 	};
@@ -46,6 +105,49 @@ const ClientList = () => {
 	// Function to handle form submission for updating a client
 	const handleUpdateClient = (e) => {
 		e.preventDefault();
+
+		let errors = {};
+
+		// Email format validation
+		if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(editingClient.clientEmail)) {
+			errors.clientEmail = "Formato de correo electrónico inválido";
+		}
+
+		// Check for duplicate RUT or email (excluding the client being edited)
+		const duplicateRut = clients.some(
+			(client) =>
+				client.id !== editingClient.id &&
+				client.clientRut.replace(/\./g, "").toUpperCase() ===
+					editingClient.clientRut.replace(/\./g, "").toUpperCase()
+		);
+		const duplicateEmail = clients.some(
+			(client) =>
+				client.id !== editingClient.id &&
+				client.clientEmail.trim().toLowerCase() ===
+					editingClient.clientEmail.trim().toLowerCase()
+		);
+
+		if (duplicateRut) {
+			setMessage({
+				show: true,
+				message: "Ya existe un cliente registrado con ese RUT.",
+			});
+			return;
+		}
+		if (duplicateEmail) {
+			setMessage({
+				show: true,
+				message: "Ya existe un cliente registrado con ese correo.",
+			});
+			return;
+		}
+		if (Object.keys(errors).length > 0) {
+			setEditErrors(errors);
+			return;
+		}
+
+		setEditErrors({});
+
 		clientService
 			.updateClient(editingClient)
 			.then(() => {
@@ -54,12 +156,18 @@ const ClientList = () => {
 						client.id === editingClient.id ? editingClient : client
 					)
 				);
-				alert("Cliente actualizado exitosamente.");
+				setMessage({
+					show: true,
+					message: "Cliente actualizado exitosamente.",
+				});
 				setEditingClient(null);
 			})
 			.catch((error) => {
 				console.error("Error updating client:", error);
-				alert("Hubo un error al actualizar el cliente.");
+				setMessage({
+					show: true,
+					message: "Hubo un error al actualizar el cliente.",
+				});
 			});
 	};
 
@@ -91,14 +199,12 @@ const ClientList = () => {
 			}
 
 			setEditingClient({ ...editingClient, [name]: formatted });
-		} else if (name === "clientEmail") {
-			// Validate email format
-			if (!/\S+@\S+\.\S+/.test(value)) {
-				alert("Formato de correo electrónico inválido");
-			}
-			setEditingClient({ ...editingClient, [name]: value });
 		} else {
 			setEditingClient({ ...editingClient, [name]: value });
+		}
+		// Clear error on change
+		if (editErrors[name]) {
+			setEditErrors((prev) => ({ ...prev, [name]: "" }));
 		}
 	};
 
@@ -145,8 +251,15 @@ const ClientList = () => {
 		},
 	};
 
+	const closeMessage = () => setMessage({ ...message, show: false });
+
 	return (
 		<div style={{ padding: "2rem", position: "relative" }}>
+			<MessageOverlay
+				show={message.show}
+				message={message.message}
+				onClose={closeMessage}
+			/>
 			{/* Register Client button */}
 			<div style={{ position: "absolute", top: "1rem", right: "1rem" }}>
 				<Link to="/RegisterClient">
@@ -209,6 +322,11 @@ const ClientList = () => {
 								onChange={handleInputChange}
 								style={{ marginLeft: "1rem", padding: "0.5rem" }}
 							/>
+							{editErrors.clientEmail && (
+								<div style={{ color: "red", fontSize: "0.9rem" }}>
+									{editErrors.clientEmail}
+								</div>
+							)}
 						</div>
 						<div style={{ marginBottom: "1rem" }}>
 							<label>Teléfono:</label>

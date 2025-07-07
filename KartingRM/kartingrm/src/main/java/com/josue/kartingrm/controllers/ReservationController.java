@@ -1,23 +1,24 @@
 package com.josue.kartingrm.controllers;
 
 import com.josue.kartingrm.entities.ReservationEntity;
-import com.josue.kartingrm.services.ReceiptService;
 import com.josue.kartingrm.services.ReservationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/reservation")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173/")
 public class ReservationController {
-	@Autowired
+	final
 	ReservationService reservationService;
+
+	public ReservationController(ReservationService reservationService) {
+		this.reservationService = reservationService;
+	}
 
 	@GetMapping("/")
 	public ResponseEntity<List<ReservationEntity>> listReservations() {
@@ -48,7 +49,7 @@ public class ReservationController {
 			event.put("start", res.getStartTime());
 			event.put("end", res.getEndTime());
 			return event;
-		}).collect(Collectors.toList());
+		}).toList();
 	}
 
 	@DeleteMapping("/{id}")

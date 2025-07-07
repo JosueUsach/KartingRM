@@ -7,7 +7,6 @@ import com.josue.kartingrm.repositories.ClientRepository;
 import com.josue.kartingrm.repositories.ReceiptRepository;
 import com.josue.kartingrm.repositories.ReservationRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -17,12 +16,9 @@ import java.util.*;
 @Service
 @Transactional
 public class ReceiptService {
-	@Autowired
-	private ReceiptRepository receiptRepository;
-	@Autowired
-	private ClientRepository clientRepository;
-	@Autowired
-	private ReservationRepository reservationRepository;
+	private final ReceiptRepository receiptRepository;
+	private final ClientRepository clientRepository;
+	private final ReservationRepository reservationRepository;
 
 	private static final Set<String> holidays = new HashSet<>();
 	// Example holidays
@@ -30,6 +26,12 @@ public class ReceiptService {
 		holidays.add("01-01"); // New year
 		holidays.add("12-25"); // Christmas
 		holidays.add("09-18"); // Fiestas patrias
+	}
+
+	public ReceiptService(ReceiptRepository receiptRepository, ClientRepository clientRepository, ReservationRepository reservationRepository) {
+		this.receiptRepository = receiptRepository;
+		this.clientRepository = clientRepository;
+		this.reservationRepository = reservationRepository;
 	}
 
 	// Input: A client, a reservation and checks for discounts

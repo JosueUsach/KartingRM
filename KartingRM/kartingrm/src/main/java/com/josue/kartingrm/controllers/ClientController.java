@@ -2,7 +2,6 @@ package com.josue.kartingrm.controllers;
 
 import com.josue.kartingrm.entities.ClientEntity;
 import com.josue.kartingrm.services.ClientService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,10 +9,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/client")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173/")
 public class ClientController {
-	@Autowired
+	final
 	ClientService clientService;
+
+	public ClientController(ClientService clientService) {
+		this.clientService = clientService;
+	}
 
 	@GetMapping("/")
 	public ResponseEntity<List<ClientEntity>> listClients() {
@@ -28,7 +31,7 @@ public class ClientController {
 	}
 
 	@DeleteMapping("/{id}")
-	public void deleteClient(@PathVariable Long id) throws Exception {
+	public void deleteClient(@PathVariable Long id) {
 		clientService.deleteClient(id);
 	}
 

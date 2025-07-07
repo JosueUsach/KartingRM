@@ -8,6 +8,7 @@ class KartingRmApplicationTests {
 
 	@Test
 	void contextLoads() {
+		// En esta ocasion no se necesitan tests
 	}
 
 }

@@ -11,10 +11,9 @@ const RegisterClient = () => {
 	});
 
 	const [errors, setErrors] = useState({});
-	const [toast, setToast] = useState({
+	const [modal, setModal] = useState({
 		show: false,
 		message: "",
-		type: "success",
 	});
 
 	const handleChange = (e) => {
@@ -75,7 +74,7 @@ const RegisterClient = () => {
 		if (!form.clientEmail) {
 			newErrors.clientEmail = "Introduzca correo electrónico";
 			valid = false;
-		} else if (!/\S+@\S+\.\S+/.test(form.clientEmail)) {
+		} else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.clientEmail)) {
 			newErrors.clientEmail = "Formato de correo electrónico inválido";
 			valid = false;
 		}
@@ -123,17 +122,15 @@ const RegisterClient = () => {
 			.then((res) => {
 				console.log("Registro", res);
 				if (res.data == "") {
-					setToast({
+					setModal({
 						show: true,
 						message: "El cliente ya está registrado con ese correo o RUT.",
-						type: "error",
 					});
 					return;
 				}
-				setToast({
+				setModal({
 					show: true,
 					message: "Cliente registrado!",
-					type: "success",
 				});
 				setForm({
 					clientRut: "",
@@ -144,21 +141,12 @@ const RegisterClient = () => {
 				});
 			})
 			.catch((err) => {
-				setToast({
+				setModal({
 					show: true,
 					message: "Ocurrió un error al registrar el cliente.",
-					type: "error",
 				});
 			});
 	};
-
-	// Toast auto-hide effect
-	React.useEffect(() => {
-		if (toast.show) {
-			const timer = setTimeout(() => setToast({ ...toast, show: false }), 3000);
-			return () => clearTimeout(timer);
-		}
-	}, [toast]);
 
 	const inputStyle = {
 		padding: "0.5rem",
@@ -180,26 +168,65 @@ const RegisterClient = () => {
 		marginTop: "0.2rem",
 	};
 
-	const toastStyle = {
+	const modalOverlayStyle = {
 		position: "fixed",
-		bottom: "30px", // Changed from top to bottom
-		left: "50%",
-		transform: "translateX(-50%)",
-		background: toast.type === "success" ? "#4CAF50" : "#d03434",
-		color: "white",
-		padding: "1rem 2rem",
-		borderRadius: "8px",
-		boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-		fontSize: "1.1rem",
+		top: 0,
+		left: 0,
+		width: "100vw",
+		height: "100vh",
+		background: "rgba(0,0,0,0.4)",
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
 		zIndex: 9999,
-		transition: "opacity 0.3s",
-		opacity: toast.show ? 1 : 0,
-		pointerEvents: "none",
 	};
+
+	const modalContentStyle = {
+		background: "white",
+		padding: "2rem",
+		borderRadius: "10px",
+		minWidth: "320px",
+		maxWidth: "90vw",
+		boxShadow: "0 4px 24px rgba(0,0,0,0.2)",
+		color: "black",
+		textAlign: "center",
+	};
+
+	const closeModal = () => setModal({ ...modal, show: false });
 
 	return (
 		<div style={{ padding: "2rem", textAlign: "center" }}>
-			{toast.show && <div style={toastStyle}>{toast.message}</div>}
+			{modal.show && (
+				<div style={modalOverlayStyle} data-testid="client-modal-overlay">
+					<div style={modalContentStyle}>
+						<p
+							style={{
+								fontWeight: "bold",
+								fontSize: "1.2rem",
+							}}
+						>
+							{modal.message}
+						</p>
+						<button
+							onClick={closeModal}
+							style={{
+								marginTop: "1.5rem",
+								padding: "0.5rem 1.5rem",
+								background: "#8b0000",
+								color: "white",
+								border: "none",
+								borderRadius: "5px",
+								fontWeight: "bold",
+								cursor: "pointer",
+								fontSize: "1rem",
+							}}
+							data-testid="client-modal-close"
+						>
+							Cerrar
+						</button>
+					</div>
+				</div>
+			)}
 			<h2 style={{ fontSize: "2.2rem" }}>Registrar Cliente</h2>
 			<form
 				onSubmit={handleSubmit}

@@ -12,10 +12,9 @@ const MakeReservation = () => {
 
 	const [endTime, setEndTime] = useState("");
 	const [errors, setErrors] = useState({});
-	const [toast, setToast] = useState({
+	const [modal, setModal] = useState({
 		show: false,
 		message: "",
-		type: "error",
 	});
 
 	useEffect(() => {
@@ -28,13 +27,6 @@ const MakeReservation = () => {
 		);
 		setEndTime(end.toISOString());
 	}, [form.startTime, form.reservationType]);
-
-	useEffect(() => {
-		if (toast.show) {
-			const timer = setTimeout(() => setToast({ ...toast, show: false }), 3500);
-			return () => clearTimeout(timer);
-		}
-	}, [toast]);
 
 	const handleRiderAmountChange = (e) => {
 		const amount = Math.min(parseInt(e.target.value || 0), 15);
@@ -220,10 +212,9 @@ const MakeReservation = () => {
 				await receiptService.saveReceipt(receiptData);
 			}
 
-			setToast({
+			setModal({
 				show: true,
 				message: "Reserva y comprobantes guardados!",
-				type: "success",
 			});
 
 			setForm({
@@ -243,7 +234,7 @@ const MakeReservation = () => {
 			const backendMsg =
 				error.response?.data?.message ||
 				"Error al crear la reserva. Verifique los datos e intente nuevamente.";
-			setToast({ show: true, message: backendMsg, type: "error" });
+			setModal({ show: true, message: backendMsg });
 		}
 	};
 
@@ -284,27 +275,66 @@ const MakeReservation = () => {
 		transition: "all 0.3s ease",
 	};
 
-	const toastStyle = {
+	const modalOverlayStyle = {
 		position: "fixed",
-		bottom: "30px",
-		left: "50%",
-		transform: "translateX(-50%)",
-		background: toast.type === "success" ? "#4CAF50" : "#d03434",
-		color: "white",
-		padding: "1rem 2rem",
-		borderRadius: "8px",
-		boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-		fontSize: "1.1rem",
+		top: 0,
+		left: 0,
+		width: "100vw",
+		height: "100vh",
+		background: "rgba(0,0,0,0.4)",
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
 		zIndex: 9999,
-		transition: "opacity 0.3s",
-		opacity: toast.show ? 1 : 0,
-		pointerEvents: "none",
 	};
+
+	const modalContentStyle = {
+		background: "white",
+		padding: "2rem",
+		borderRadius: "10px",
+		minWidth: "320px",
+		maxWidth: "90vw",
+		boxShadow: "0 4px 24px rgba(0,0,0,0.2)",
+		color: "black",
+		textAlign: "center",
+	};
+
+	const closeModal = () => setModal({ ...modal, show: false });
 
 	return (
 		<div style={{ padding: "2rem", textAlign: "center" }}>
+			{modal.show && (
+				<div style={modalOverlayStyle} data-testid="reservation-modal-overlay">
+					<div style={modalContentStyle}>
+						<p
+							style={{
+								fontWeight: "bold",
+								fontSize: "1.2rem",
+							}}
+						>
+							{modal.message}
+						</p>
+						<button
+							onClick={closeModal}
+							style={{
+								marginTop: "1.5rem",
+								padding: "0.5rem 1.5rem",
+								background: "#8b0000",
+								color: "white",
+								border: "none",
+								borderRadius: "5px",
+								fontWeight: "bold",
+								cursor: "pointer",
+								fontSize: "1rem",
+							}}
+							data-testid="reservation-modal-close"
+						>
+							Cerrar
+						</button>
+					</div>
+				</div>
+			)}
 			<h2 style={{ fontSize: "2.2rem" }}>Reservar hora</h2>
-			{toast.show && <div style={toastStyle}>{toast.message}</div>}
 			<form
 				onSubmit={handleSubmit}
 				style={{

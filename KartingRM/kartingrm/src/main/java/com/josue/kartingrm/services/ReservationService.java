@@ -3,9 +3,10 @@ package com.josue.kartingrm.services;
 import com.josue.kartingrm.entities.ReservationEntity;
 import com.josue.kartingrm.repositories.ClientRepository;
 import com.josue.kartingrm.repositories.ReservationRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,38 +14,47 @@ import java.util.List;
 @Service
 @Transactional
 public class ReservationService {
-	@Autowired
-	private ReservationRepository reservationRepository;
-	@Autowired
-	private ClientRepository clientRepository;
-	@Autowired
-	private ReceiptService receiptService;
+	private final ReservationRepository reservationRepository;
+	private final ClientRepository clientRepository;
+	private final ReceiptService receiptService;
+
+	public ReservationService(ReservationRepository reservationRepository, ClientRepository clientRepository, ReceiptService receiptService) {
+		this.reservationRepository = reservationRepository;
+		this.clientRepository = clientRepository;
+		this.receiptService = receiptService;
+	}
 
 	// Input: A reservation object
 	// Description: Adds the inputted reservation to the DB and links all clients to it
 	// Output: A saved reservation
 	public ReservationEntity createReservation(ReservationEntity reservation) {
-		// Check if all clients exist
-		for (String rut : reservation.getClientRuts()) {
-			clientRepository.findByClientRut(rut)
-					.orElseThrow(() -> new RuntimeException("Client with RUT " + rut + " not found"));
-		}
+    // Check if all clients exist
+    for (String rut : reservation.getClientRuts()) {
+        clientRepository.findByClientRut(rut)
+                .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Client with RUT " + rut + " not found"
+                ));
+    }
 
-        // Check for overlapping reservations
-        List<ReservationEntity> overlappingReservations = reservationRepository
-                .findOverlappingReservations(reservation.getStartTime(), reservation.getEndTime());
+    // Check for overlapping reservations
+    List<ReservationEntity> overlappingReservations = reservationRepository
+            .findOverlappingReservations(reservation.getStartTime(), reservation.getEndTime());
 
-        if (!overlappingReservations.isEmpty()) {
-				throw new RuntimeException("Cannot create reservation: Time slot overlaps with existing reservation(s)");
-		}
+    if (!overlappingReservations.isEmpty()) {
+        throw new ResponseStatusException(
+            HttpStatus.CONFLICT,
+            "Cannot create reservation: Time slot overlaps with existing reservation(s)"
+        );
+    }
 
-		return reservationRepository.save(reservation);
-	}
+    return reservationRepository.save(reservation);
+}
 
 	// Description: Finds all reservations and puts them in an array
 	// Output: An array of reservations
-	public ArrayList<ReservationEntity> getAllReservations() {
-		return (ArrayList<ReservationEntity>) reservationRepository.findAll();
+	public List<ReservationEntity> getAllReservations() {
+		return reservationRepository.findAll();
 	}
 
 	// Input: An ID
@@ -56,7 +66,7 @@ public class ReservationService {
 	}
 
 	public void deleteReservation(Long reservationId) {
-		// First delete all associated receipts
+		// First, delete all associated receipts
 		receiptService.deleteReceiptByReservationId(reservationId);
 
 		// Then delete the reservation
