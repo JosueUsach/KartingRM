@@ -24,7 +24,7 @@ const RegisterClient = () => {
 			setForm({ ...form, [name]: numericValue });
 		} else if (name === "clientRut") {
 			// Clean input: remove dots and dashes
-			let cleaned = value.replace(/[^\dkK]/g, "").toUpperCase();
+			let cleaned = value.replace(/[^0-9kK]/gi, "").toUpperCase();
 
 			// Limit to 9 characters (8 digits + 1 check digit)
 			cleaned = cleaned.slice(0, 9);
@@ -74,7 +74,11 @@ const RegisterClient = () => {
 		if (!form.clientEmail) {
 			newErrors.clientEmail = "Introduzca correo electrónico";
 			valid = false;
-		} else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.clientEmail)) {
+		} else if (
+			!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,10}$/.test(
+				form.clientEmail
+			)
+		) {
 			newErrors.clientEmail = "Formato de correo electrónico inválido";
 			valid = false;
 		}

@@ -124,13 +124,10 @@ const MakeReservation = () => {
 						"Solo se puede reservar entre 10:00 y 22:00 los fines de semana";
 					valid = false;
 				}
-			} else {
-				// Weekdays: 14:00 to 22:00
-				if (hour < 14 || hour >= 22) {
-					newErrors.startTime =
-						"Solo se puede reservar entre 14:00 y 22:00 de lunes a viernes";
-					valid = false;
-				}
+			} else if (hour < 14 || hour >= 22) {
+				newErrors.startTime =
+					"Solo se puede reservar entre 14:00 y 22:00 de lunes a viernes";
+				valid = false;
 			}
 		}
 
@@ -347,8 +344,11 @@ const MakeReservation = () => {
 			>
 				{/* Start Time */}
 				<div style={wrapperStyle}>
-					<label style={labelStyle}>Hora y fecha de inicio</label>
+					<label htmlFor="reservation-startTime" style={labelStyle}>
+						Hora y fecha de inicio
+					</label>
 					<input
+						id="reservation-startTime"
 						type="datetime-local"
 						name="startTime"
 						value={form.startTime}
@@ -361,8 +361,11 @@ const MakeReservation = () => {
 
 				{/* Reservation Type */}
 				<div style={wrapperStyle}>
-					<label style={labelStyle}>Duración</label>
+					<label htmlFor="reservation-type" style={labelStyle}>
+						Duración
+					</label>
 					<select
+						id="reservation-type"
 						name="reservationType"
 						value={form.reservationType}
 						onChange={handleChange}
@@ -377,8 +380,11 @@ const MakeReservation = () => {
 
 				{/* Rider Amount */}
 				<div style={wrapperStyle}>
-					<label style={labelStyle}>Cantidad de personas (15 máx.)</label>
+					<label htmlFor="reservation-riderAmount" style={labelStyle}>
+						Cantidad de personas (15 máx.)
+					</label>
 					<input
+						id="reservation-riderAmount"
 						type="number"
 						name="riderAmount"
 						value={form.riderAmount}
@@ -403,6 +409,7 @@ const MakeReservation = () => {
 							}}
 						>
 							<input
+								id={`reservation-clientRut-${index}`}
 								type="text"
 								placeholder={
 									index === 0
@@ -419,8 +426,14 @@ const MakeReservation = () => {
 									alignItems: "center",
 								}}
 							>
-								<label style={{ marginBottom: "0.2rem" }}>Frecuencia</label>
+								<label
+									htmlFor={`reservation-frequency-${index}`}
+									style={{ marginBottom: "0.2rem" }}
+								>
+									Frecuencia
+								</label>
 								<input
+									id={`reservation-frequency-${index}`}
 									type="number"
 									name="frequency"
 									value={client.frequency || ""}

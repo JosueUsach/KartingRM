@@ -12,6 +12,7 @@ import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { PerspectiveCamera } from "@react-three/drei";
 import { degToRad } from "three/src/math/MathUtils.js";
+import PropTypes from "prop-types";
 
 import "./Beams.css";
 
@@ -67,6 +68,9 @@ const CanvasWrapper = ({ children }) => (
 		{children}
 	</Canvas>
 );
+CanvasWrapper.propTypes = {
+	children: PropTypes.node.isRequired,
+};
 
 const hexToNormalizedRGB = (hex) => {
 	const clean = hex.replace("#", "");
@@ -239,6 +243,16 @@ const Beams = ({
 		</CanvasWrapper>
 	);
 };
+Beams.propTypes = {
+	beamWidth: PropTypes.number,
+	beamHeight: PropTypes.number,
+	beamNumber: PropTypes.number,
+	lightColor: PropTypes.string,
+	speed: PropTypes.number,
+	noiseIntensity: PropTypes.number,
+	scale: PropTypes.number,
+	rotation: PropTypes.number,
+};
 
 function createStackedPlanesBufferGeometry(
 	n,
@@ -311,6 +325,12 @@ const MergedPlanes = forwardRef(({ material, width, count, height }, ref) => {
 	return <mesh ref={mesh} geometry={geometry} material={material} />;
 });
 MergedPlanes.displayName = "MergedPlanes";
+MergedPlanes.propTypes = {
+	material: PropTypes.object.isRequired,
+	width: PropTypes.number.isRequired,
+	count: PropTypes.number.isRequired,
+	height: PropTypes.number.isRequired,
+};
 
 const PlaneNoise = forwardRef((props, ref) => (
 	<MergedPlanes
@@ -322,6 +342,12 @@ const PlaneNoise = forwardRef((props, ref) => (
 	/>
 ));
 PlaneNoise.displayName = "PlaneNoise";
+PlaneNoise.propTypes = {
+	material: PropTypes.object.isRequired,
+	width: PropTypes.number.isRequired,
+	count: PropTypes.number.isRequired,
+	height: PropTypes.number.isRequired,
+};
 
 const DirLight = ({ position, color }) => {
 	const dir = useRef(null);
@@ -345,6 +371,10 @@ const DirLight = ({ position, color }) => {
 			position={position}
 		/>
 	);
+};
+DirLight.propTypes = {
+	position: PropTypes.arrayOf(PropTypes.number).isRequired,
+	color: PropTypes.string.isRequired,
 };
 
 export default Beams;

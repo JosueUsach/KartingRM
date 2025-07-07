@@ -4,6 +4,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import reservationService from "../services/reservation.service";
 import receiptService from "../services/receipt.service";
+import PropTypes from "prop-types";
 
 // Overlay for reservation details
 function ReservationOverlay({
@@ -17,95 +18,116 @@ function ReservationOverlay({
 	calendarStyles,
 }) {
 	if (!show) return null;
+
+	let content;
+	if (loading) {
+		content = <p>Cargando...</p>;
+	} else if (reservationDetails?.error) {
+		content = <p>{reservationDetails.error}</p>;
+	} else if (reservationDetails) {
+		content = (
+			<div>
+				<h3 style={{ textAlign: "center" }}>Detalles de la Reserva</h3>
+				<p>
+					<strong>ID:</strong> {reservationDetails.id}
+				</p>
+				<p>
+					<strong>Inicio:</strong>{" "}
+					{new Date(reservationDetails.startTime).toLocaleString("es-CL")}
+				</p>
+				<p>
+					<strong>Término:</strong>{" "}
+					{new Date(reservationDetails.endTime).toLocaleString("es-CL")}
+				</p>
+				<p>
+					<strong>Tipo:</strong>{" "}
+					{tipoReservaLabel(reservationDetails.reservationType)}
+				</p>
+				<p>
+					<strong>Cantidad de clientes:</strong>{" "}
+					{reservationDetails.riderAmount}
+				</p>
+				<p>
+					<strong>RUT Cliente principal:</strong>{" "}
+					{reservationDetails.mainClientRut}
+				</p>
+				<p>
+					<strong>RUTs de clientes:</strong>
+				</p>
+				<ul
+					style={{
+						listStyle: "none",
+						padding: 0,
+						margin: 0,
+						textAlign: "center",
+					}}
+				>
+					{reservationDetails.clientRuts.map((rut, idx) => (
+						<li
+							key={idx}
+							style={{ textAlign: "center", marginBottom: "0.5rem" }}
+						>
+							{rut}
+							<button
+								style={calendarStyles.button}
+								onClick={() => handleShowReceipt(rut, reservationDetails.id)}
+							>
+								Ver comprobante
+							</button>
+						</li>
+					))}
+				</ul>
+				<button
+					style={{
+						...calendarStyles.button,
+						backgroundColor: "#b00020",
+						marginTop: "1rem",
+						alignItems: "center",
+						justifyContent: "center",
+						gap: "0.5rem",
+					}}
+					onClick={() => handleDeleteReservation(reservationDetails.id)}
+				>
+					<span role="img" aria-label="Eliminar">
+						🗑️
+					</span>
+					Eliminar reserva
+				</button>
+			</div>
+		);
+	} else {
+		content = null;
+	}
+
 	return (
 		<div style={calendarStyles.overlay} onClick={onClose}>
 			<div
 				style={calendarStyles.overlayContent}
 				onClick={(e) => e.stopPropagation()}
 			>
-				<button style={calendarStyles.closeButton} onClick={onClose}>
+				<button
+					style={calendarStyles.closeButton}
+					onClick={onClose}
+					aria-label="Cerrar"
+				>
 					×
 				</button>
-				{loading ? (
-					<p>Cargando...</p>
-				) : reservationDetails?.error ? (
-					<p>{reservationDetails.error}</p>
-				) : reservationDetails ? (
-					<div>
-						<h3 style={{ textAlign: "center" }}>Detalles de la Reserva</h3>
-						<p>
-							<strong>ID:</strong> {reservationDetails.id}
-						</p>
-						<p>
-							<strong>Inicio:</strong>{" "}
-							{new Date(reservationDetails.startTime).toLocaleString("es-CL")}
-						</p>
-						<p>
-							<strong>Término:</strong>{" "}
-							{new Date(reservationDetails.endTime).toLocaleString("es-CL")}
-						</p>
-						<p>
-							<strong>Tipo:</strong>{" "}
-							{tipoReservaLabel(reservationDetails.reservationType)}
-						</p>
-						<p>
-							<strong>Cantidad de clientes:</strong>{" "}
-							{reservationDetails.riderAmount}
-						</p>
-						<p>
-							<strong>RUT Cliente principal:</strong>{" "}
-							{reservationDetails.mainClientRut}
-						</p>
-						<p>
-							<strong>RUTs de clientes:</strong>
-						</p>
-						<ul
-							style={{
-								listStyle: "none",
-								padding: 0,
-								margin: 0,
-								textAlign: "center",
-							}}
-						>
-							{reservationDetails.clientRuts.map((rut, idx) => (
-								<li
-									key={idx}
-									style={{ textAlign: "center", marginBottom: "0.5rem" }}
-								>
-									{rut}
-									<button
-										style={calendarStyles.button}
-										onClick={() =>
-											handleShowReceipt(rut, reservationDetails.id)
-										}
-									>
-										Ver comprobante
-									</button>
-								</li>
-							))}
-						</ul>
-						<button
-							style={{
-								...calendarStyles.button,
-								backgroundColor: "#b00020",
-								marginTop: "1rem",
-								alignItems: "center",
-								justifyContent: "center",
-								gap: "0.5rem",
-							}}
-							onClick={() => handleDeleteReservation(reservationDetails.id)}
-						>
-							<span role="img" aria-label="Eliminar">
-								🗑️
-							</span>
-							Eliminar reserva
-						</button>
-					</div>
-				) : null}
+				{content}
 			</div>
 		</div>
 	);
 }
+
+ReservationOverlay.propTypes = {
+	show: PropTypes.bool.isRequired,
+	onClose: PropTypes.func.isRequired,
+	loading: PropTypes.bool.isRequired,
+	reservationDetails: PropTypes.object,
+	tipoReservaLabel: PropTypes.func.isRequired,
+	handleShowReceipt: PropTypes.func.isRequired,
+	handleDeleteReservation: PropTypes.func.isRequired,
+	calendarStyles: PropTypes.object.isRequired,
+};
 
 // Overlay for receipt details
 function ReceiptOverlay({
@@ -122,7 +144,11 @@ function ReceiptOverlay({
 				style={calendarStyles.overlayContent}
 				onClick={(e) => e.stopPropagation()}
 			>
-				<button style={calendarStyles.closeButton} onClick={onClose}>
+				<button
+					style={calendarStyles.closeButton}
+					onClick={onClose}
+					aria-label="Cerrar"
+				>
 					×
 				</button>
 				{loading ? (
@@ -191,6 +217,14 @@ function ReceiptOverlay({
 	);
 }
 
+ReceiptOverlay.propTypes = {
+	show: PropTypes.bool.isRequired,
+	onClose: PropTypes.func.isRequired,
+	loading: PropTypes.bool.isRequired,
+	receiptDetails: PropTypes.object,
+	calendarStyles: PropTypes.object.isRequired,
+};
+
 // Overlay for messages
 function MessageOverlay({ show, message, type, onClose }) {
 	if (!show) return null;
@@ -248,6 +282,13 @@ function MessageOverlay({ show, message, type, onClose }) {
 		</div>
 	);
 }
+
+MessageOverlay.propTypes = {
+	show: PropTypes.bool.isRequired,
+	message: PropTypes.string.isRequired,
+	type: PropTypes.string,
+	onClose: PropTypes.func.isRequired,
+};
 
 // Overlay for confirmation
 function ConfirmOverlay({ show, message, onConfirm, onCancel }) {
@@ -323,6 +364,13 @@ function ConfirmOverlay({ show, message, onConfirm, onCancel }) {
 		</div>
 	);
 }
+
+ConfirmOverlay.propTypes = {
+	show: PropTypes.bool.isRequired,
+	message: PropTypes.string.isRequired,
+	onConfirm: PropTypes.func.isRequired,
+	onCancel: PropTypes.func.isRequired,
+};
 
 const Rack = () => {
 	const [events, setEvents] = useState([]);

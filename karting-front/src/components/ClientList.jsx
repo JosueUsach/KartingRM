@@ -108,8 +108,12 @@ const ClientList = () => {
 
 		let errors = {};
 
-		// Email format validation
-		if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(editingClient.clientEmail)) {
+		// Use a linear, safe regex for email validation (no nested quantifiers)
+		if (
+			!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,10}$/.test(
+				editingClient.clientEmail
+			)
+		) {
 			errors.clientEmail = "Formato de correo electrónico inválido";
 		}
 
@@ -294,8 +298,9 @@ const ClientList = () => {
 					<h3>Editar Cliente</h3>
 					<form onSubmit={handleUpdateClient}>
 						<div style={{ marginBottom: "1rem" }}>
-							<label>Nombre:</label>
+							<label htmlFor="edit-clientName">Nombre:</label>
 							<input
+								id="edit-clientName"
 								type="text"
 								name="clientName"
 								value={editingClient.clientName}
@@ -304,8 +309,9 @@ const ClientList = () => {
 							/>
 						</div>
 						<div style={{ marginBottom: "1rem" }}>
-							<label>RUT:</label>
+							<label htmlFor="edit-clientRut">RUT:</label>
 							<input
+								id="edit-clientRut"
 								type="text"
 								name="clientRut"
 								value={editingClient.clientRut}
@@ -314,8 +320,9 @@ const ClientList = () => {
 							/>
 						</div>
 						<div style={{ marginBottom: "1rem" }}>
-							<label>Email:</label>
+							<label htmlFor="edit-clientEmail">Email:</label>
 							<input
+								id="edit-clientEmail"
 								type="email"
 								name="clientEmail"
 								value={editingClient.clientEmail}
@@ -329,8 +336,9 @@ const ClientList = () => {
 							)}
 						</div>
 						<div style={{ marginBottom: "1rem" }}>
-							<label>Teléfono:</label>
+							<label htmlFor="edit-clientPhone">Teléfono:</label>
 							<input
+								id="edit-clientPhone"
 								type="text"
 								name="clientPhone"
 								value={editingClient.clientPhone}
@@ -339,8 +347,9 @@ const ClientList = () => {
 							/>
 						</div>
 						<div style={{ marginBottom: "1rem" }}>
-							<label>Fecha de Nacimiento:</label>
+							<label htmlFor="edit-clientBirthDate">Fecha de Nacimiento:</label>
 							<input
+								id="edit-clientBirthDate"
 								type="date"
 								name="clientBirthDate"
 								value={editingClient.clientBirthDate}
