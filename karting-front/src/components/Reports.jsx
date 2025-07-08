@@ -40,7 +40,7 @@ const Reports = () => {
 
 	// Function to format numbers with $ and thousands separators
 	const formatCurrency = (value) => {
-		if (typeof value !== "number") return value;
+		if (typeof value !== "number" || isNaN(value)) return "$0";
 		return new Intl.NumberFormat("es-CL", {
 			style: "currency",
 			currency: "CLP",

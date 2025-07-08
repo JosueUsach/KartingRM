@@ -307,8 +307,7 @@ const PricingCards = () => {
 				El descuento por cumpleaños solo se aplica a la persona que cumple años
 				y solo si el grupo es de 3 personas o mas. Si hay una segunda persona de
 				cumpleaños, el descuento solo se aplica si el grupo es de 6 personas o
-				más. El trabajador registrando la reserva se encargará de verificar los
-				cumplaños y aplicar el descuento correspondiente.
+				más.
 			</p>
 		</div>
 	);

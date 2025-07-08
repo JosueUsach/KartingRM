@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import reservationService from "../services/reservation.service";
 import receiptService from "../services/receipt.service";
+import clientService from "../services/client.service";
 
 const MakeReservation = () => {
 	const [form, setForm] = useState({
@@ -16,6 +18,8 @@ const MakeReservation = () => {
 		show: false,
 		message: "",
 	});
+
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		if (!form.startTime) return;
@@ -164,9 +168,33 @@ const MakeReservation = () => {
 		return valid;
 	};
 
+	// Cambia esta función:
+	const checkRutsExist = async (clientRuts) => {
+		const response = await clientService.getAll();
+		const registeredRuts = response.data.map((client) =>
+			client.clientRut.replace(/\./g, "").toUpperCase()
+		);
+		const notRegistered = clientRuts
+			.map((r) => r.rut.replace(/\./g, "").toUpperCase())
+			.filter((rut) => !registeredRuts.includes(rut));
+		return notRegistered;
+	};
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (!validateForm()) return;
+
+		// Verifica que todos los RUTs existan
+		const notRegistered = await checkRutsExist(form.clientRuts);
+		if (notRegistered.length > 0) {
+			setModal({
+				show: true,
+				message: `Error al crear la reserva. Los siguientes RUTs NO están registrados: ${notRegistered.join(
+					", "
+				)}`,
+			});
+			return;
+		}
 
 		try {
 			const formatLocalDateTime = (dateString) => {
@@ -230,7 +258,7 @@ const MakeReservation = () => {
 			});
 			const backendMsg =
 				error.response?.data?.message ||
-				"Error al crear la reserva. Verifique los datos e intente nuevamente.";
+				"Error al crear la reserva. Esa hora ya está reservada.";
 			setModal({ show: true, message: backendMsg });
 		}
 	};
@@ -311,6 +339,28 @@ const MakeReservation = () => {
 						>
 							{modal.message}
 						</p>
+						{modal.message.includes("NO están registrados") && (
+							<button
+								onClick={() => {
+									setModal({ ...modal, show: false });
+									navigate("/RegisterClient");
+								}}
+								style={{
+									marginTop: "1rem",
+									padding: "0.5rem 1.5rem",
+									background: "#1976d2",
+									color: "white",
+									border: "none",
+									borderRadius: "5px",
+									fontWeight: "bold",
+									cursor: "pointer",
+									fontSize: "1rem",
+									marginRight: "1rem",
+								}}
+							>
+								Registrar Cliente
+							</button>
+						)}
 						<button
 							onClick={closeModal}
 							style={{

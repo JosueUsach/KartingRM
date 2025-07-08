@@ -13,7 +13,7 @@ const Home = () => {
 					left: 0,
 					width: "100%",
 					height: "100%",
-					zIndex: -1, // Places it behind other content
+					zIndex: -1,
 				}}
 			>
 				<Beams
@@ -39,8 +39,13 @@ const Home = () => {
 			>
 				<h1>KartingRM</h1>
 				<p>
-					Esta pagina es para el uso exclusivo de los trabajadores de KartingRM,
-					para apoyar en el proceso de generación de reservas.
+					Para poder crear una reserva, es necesario registrar a los clientes
+					involucrados, para registrarlos, dirígete a la sección "Lista /
+					Registrar clientes" en el menú de navegación.
+					<br />
+					<br />
+					Luego de registrar a los clientes, podrás crear una reserva
+					seleccionando la opción "Reservar hora" en el menú de navegación.
 				</p>
 			</div>
 		</div>

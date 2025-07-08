@@ -3,6 +3,7 @@ package com.josue.kartingrm.services;
 import com.josue.kartingrm.entities.ReservationEntity;
 import com.josue.kartingrm.repositories.ClientRepository;
 import com.josue.kartingrm.repositories.ReservationRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @Transactional
 public class ReservationService {
@@ -41,11 +43,12 @@ public class ReservationService {
     List<ReservationEntity> overlappingReservations = reservationRepository
             .findOverlappingReservations(reservation.getStartTime(), reservation.getEndTime());
 
+    // Replace the existing validation with this:
     if (!overlappingReservations.isEmpty()) {
-        throw new ResponseStatusException(
-            HttpStatus.CONFLICT,
-            "Cannot create reservation: Time slot overlaps with existing reservation(s)"
-        );
+        log.warn("Attempted to create overlapping reservation for time slot: {} to {}",
+            reservation.getStartTime(),
+            reservation.getEndTime());
+        throw new IllegalStateException("Time slot overlaps with existing reservation(s)");
     }
 
     return reservationRepository.save(reservation);

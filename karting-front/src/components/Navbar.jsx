@@ -14,8 +14,8 @@ import SportsMotorsportsIcon from "@mui/icons-material/SportsMotorsports";
 
 const pages = [
 	{ label: "Tarifas", path: "/Costs" },
+	{ label: "Lista / Registrar clientes", path: "/ClientList" },
 	{ label: "Reservar hora", path: "/MakeReservation" },
-	{ label: "Clientes", path: "/ClientList" },
 	{ label: "Calendario", path: "/Rack" },
 	{ label: "Reportes de ingreso", path: "/Reports" },
 ];

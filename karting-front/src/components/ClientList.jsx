@@ -285,7 +285,6 @@ const ClientList = () => {
 					</button>
 				</Link>
 			</div>
-
 			{/* Edit Form */}
 			{editingClient && (
 				<div
@@ -397,84 +396,110 @@ const ClientList = () => {
 					</form>
 				</div>
 			)}
-
 			{/* Table to display client data */}
 			<h2 style={{ fontSize: "2.2rem" }}>Lista de Clientes</h2>
 			<div style={tableStyles.tableContainer}>
-				<table style={tableStyles.table}>
-					<thead>
-						<tr style={tableStyles.tableHeader}>
-							<th style={{ padding: "15px", textAlign: "center" }}>Nombre</th>
-							<th style={{ padding: "15px", textAlign: "center" }}>RUT</th>
-							<th style={{ padding: "15px", textAlign: "center" }}>Email</th>
-							<th style={{ padding: "15px", textAlign: "center" }}>Teléfono</th>
-							<th style={{ padding: "15px", textAlign: "center" }}>
-								Fecha de Nacimiento
-							</th>
-							<th style={{ padding: "15px", textAlign: "center" }}>Acciones</th>
-						</tr>
-					</thead>
-					<tbody>
-						{clients.map((client, index) => (
-							<tr
-								key={client.id}
-								style={
-									index % 2 === 0 ? tableStyles.evenRow : tableStyles.oddRow
-								}
-							>
-								<td style={tableStyles.tableCell}>{client.clientName}</td>
-								<td style={tableStyles.tableCell}>{client.clientRut}</td>
-								<td style={tableStyles.tableCell}>{client.clientEmail}</td>
-								<td style={tableStyles.tableCell}>{client.clientPhone}</td>
-								<td style={tableStyles.tableCell}>
-									{formatDate(client.clientBirthDate)}
-								</td>
-								<td style={tableStyles.tableCell}>
-									<button
-										onClick={() => handleEditClient(client)}
-										style={{
-											marginRight: "0.5rem",
-											padding: "0.5rem 1rem",
-											backgroundColor: "#333333",
-											border: "2px solid transparent",
-											cursor: "pointer",
-											transition:
-												"box-shadow 0.3s ease, border-color 0.3s ease",
-										}}
-										onMouseOver={(e) => {
-											e.target.style.borderColor = "#d03434";
-										}}
-										onMouseOut={(e) => {
-											e.target.style.borderColor = "transparent";
-										}}
-									>
-										Editar
-									</button>
-									<button
-										onClick={() => handleDeleteClient(client.id)}
-										style={{
-											backgroundColor: "#d03434",
-											color: "white",
-											border: "none",
-											padding: "0.5rem 1rem",
-											cursor: "pointer",
-											borderRadius: "5px",
-											transition: "background-color 0.3s ease",
-										}}
-										onMouseOver={(e) =>
-											(e.target.style.backgroundColor = "#a82828")
-										}
-										onMouseOut={(e) =>
-											(e.target.style.backgroundColor = "#d03434")
-										}
-									>
-										Eliminar
-									</button>
-								</td>
+				{clients.length === 0 ? (
+					<div
+						style={{
+							textAlign: "center",
+							padding: "2rem",
+							backgroundColor: "#f8f9fa",
+							borderRadius: "8px",
+							boxShadow: "0 2px 15px rgba(0, 0, 0, 0.1)",
+							margin: "2rem 0",
+						}}
+					>
+						<h3
+							style={{
+								fontSize: "1.5rem",
+								color: "black",
+								marginBottom: "1rem",
+							}}
+						>
+							No se encontraron clientes
+						</h3>
+					</div>
+				) : (
+					<table style={tableStyles.table}>
+						<thead>
+							<tr style={tableStyles.tableHeader}>
+								<th style={{ padding: "15px", textAlign: "center" }}>Nombre</th>
+								<th style={{ padding: "15px", textAlign: "center" }}>RUT</th>
+								<th style={{ padding: "15px", textAlign: "center" }}>Email</th>
+								<th style={{ padding: "15px", textAlign: "center" }}>
+									Teléfono
+								</th>
+								<th style={{ padding: "15px", textAlign: "center" }}>
+									Fecha de Nacimiento
+								</th>
+								<th style={{ padding: "15px", textAlign: "center" }}>
+									Acciones
+								</th>
 							</tr>
-						))}
-					</tbody>
-				</table>
+						</thead>
+						<tbody>
+							{clients.map((client, index) => (
+								<tr
+									key={client.id}
+									style={
+										index % 2 === 0 ? tableStyles.evenRow : tableStyles.oddRow
+									}
+								>
+									<td style={tableStyles.tableCell}>{client.clientName}</td>
+									<td style={tableStyles.tableCell}>{client.clientRut}</td>
+									<td style={tableStyles.tableCell}>{client.clientEmail}</td>
+									<td style={tableStyles.tableCell}>{client.clientPhone}</td>
+									<td style={tableStyles.tableCell}>
+										{formatDate(client.clientBirthDate)}
+									</td>
+									<td style={tableStyles.tableCell}>
+										<button
+											onClick={() => handleEditClient(client)}
+											style={{
+												marginRight: "0.5rem",
+												padding: "0.5rem 1rem",
+												backgroundColor: "#333333",
+												border: "2px solid transparent",
+												cursor: "pointer",
+												transition:
+													"box-shadow 0.3s ease, border-color 0.3s ease",
+											}}
+											onMouseOver={(e) => {
+												e.target.style.borderColor = "#d03434";
+											}}
+											onMouseOut={(e) => {
+												e.target.style.borderColor = "transparent";
+											}}
+										>
+											Editar
+										</button>
+										<button
+											onClick={() => handleDeleteClient(client.id)}
+											style={{
+												backgroundColor: "#d03434",
+												color: "white",
+												border: "none",
+												padding: "0.5rem 1rem",
+												cursor: "pointer",
+												borderRadius: "5px",
+												transition: "background-color 0.3s ease",
+											}}
+											onMouseOver={(e) =>
+												(e.target.style.backgroundColor = "#a82828")
+											}
+											onMouseOut={(e) =>
+												(e.target.style.backgroundColor = "#d03434")
+											}
+										>
+											Eliminar
+										</button>
+									</td>
+								</tr>
+							))}
+						</tbody>
+					</table>
+				)}
 			</div>
 		</div>
 	);
