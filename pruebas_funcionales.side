@@ -3923,6 +3923,13 @@
       ],
       "value": "Reserva y comprobantes guardados!"
     }, {
+      "id": "1a59adfa-adf1-4f33-a6f0-c1dd15601f7a",
+      "comment": "",
+      "command": "pause",
+      "target": "2000",
+      "targets": [],
+      "value": ""
+    }, {
       "id": "ee3c5d5d-1722-44e6-9afb-f2e47b7c3bd8",
       "comment": "",
       "command": "",

@@ -33,15 +33,12 @@ public class ReservationController {
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<?> addReservation(@RequestBody ReservationEntity reservation) {
-		try {
-			ReservationEntity newReservation = reservationService.createReservation(reservation);
-			return ResponseEntity.ok(newReservation);
-		} catch (Exception e) {
-			Map<String, String> response = new HashMap<>();
-			response.put("error", "The selected time slot is not available. Please choose a different time.");
-			return ResponseEntity.badRequest().body(response);
-        }
+	public ResponseEntity<ReservationEntity> addReservation(@RequestBody ReservationEntity reservation) {
+		ReservationEntity newReservation = reservationService.createReservation(reservation);
+		if (newReservation == null) {
+			return ResponseEntity.badRequest().build();
+		}
+		return ResponseEntity.ok(newReservation);
 	}
 
 	@GetMapping("/calendar")

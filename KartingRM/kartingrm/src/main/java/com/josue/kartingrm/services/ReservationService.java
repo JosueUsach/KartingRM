@@ -48,7 +48,7 @@ public class ReservationService {
         log.warn("Attempted to create overlapping reservation for time slot: {} to {}",
             reservation.getStartTime(),
             reservation.getEndTime());
-        throw new IllegalStateException("Time slot overlaps with existing reservation(s)");
+		return null;
     }
 
     return reservationRepository.save(reservation);
